@@ -6,6 +6,12 @@ class Controller{
         $model = $model . "model"; //make them together. (class of Model)
         return new $model; //return object.
     }
+
+    protected function view($viewPage, ...$data){
+        require_once("app/views/".$viewPage.".php");
+    }
+
+
 }
 
 

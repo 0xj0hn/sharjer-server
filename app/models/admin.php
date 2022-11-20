@@ -4,6 +4,19 @@ class AdminModel extends Model{
         return "admin";
     }
     
+    public function checkEntryElements(...$params){
+        $checkedValues = [];
+        foreach($params as $key){
+            if (isset($key) && !empty($key)){
+                array_push($checkedValues, $key);
+            }
+        }
+        if (count($checkedValues) == count($params)){
+            return OK;
+        }else{
+            return ERROR;
+        }
+    }
 
     public function checkFullAdmin($username){
         $sql = "SELECT * FROM users WHERE username = '$username'";
