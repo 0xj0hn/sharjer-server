@@ -5,15 +5,14 @@ class AdminPanel extends Controller{
     public function update_month(...$params){
         $model = $this->model('admin');
         $month = $params[0];
-        $isChecked = $model->checkEntryElements($month);
-        $update = $model->update_month($params[0]);
-
+        $isChecked = $model->checkEntryInputs($month);
+        $update = $model->updateMonth($params[0]);
     }
 
     public function update_price(...$params){
         $model = $this->model('admin');
         if ($params[0]){
-            $update = $model->update_month($params[0]);
+            $update = $model->updateMonth($params[0]);
             echo $update;
         }
     }
@@ -21,7 +20,7 @@ class AdminPanel extends Controller{
     public function change_privilege(...$params){
         $model = $this->model('admin');
         if ($params[0] && $params[1]){
-            $change = $model->change_privilege($params[0], $params[1]);
+            $change = $model->changePrivilege($params[0], $params[1]);
             echo $change;
         }
     }
@@ -52,12 +51,41 @@ class AdminPanel extends Controller{
         if (isset($username) && isset($targetUsername) &&
             isset($year) && isset($month)
         ){
-            $remove_charge = $model->removeChargeOfTheUser($targetUsername, $year, $month);
-            if ($remove_charge == OK){
+            $removeCharge = $model->removeChargeOfTheUser($targetUsername, $year, $month);
+            if ($removeCharge == OK){
                 $result = ['start' => 'end'];
-                $view = $this->view("json", $result);
+                $this->view("json", $result);
             }
         }
+    }
+
+    public function add_mojtama_rules(){
+        $username = $_POST["username"];
+        $password = $_POST["password"];
+        $rule = $_POST["rule"];
+        $model = $this->model('admin');
+        $isChecked = $model->checkEntryInputs($username, $password, $rule);
+        $result = [];
+        if ($isChecked == OK){
+            $isOK = $model->addMojtamaRules($rule);
+            if ($isOK){
+                $result = [
+                    "status" => "ok",
+                    "message" => "rule added"
+                ];
+            }else{
+                $result = [
+                    "status" => "error"
+                ];
+            }
+        }else{
+            $result = [
+                "status" => "error",
+                "message" => "You haven't specified inputs"
+            ];
+
+        }
+        $this->view("json", $result);
     }
 
 }

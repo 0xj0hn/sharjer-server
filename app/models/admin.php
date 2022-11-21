@@ -4,7 +4,7 @@ class AdminModel extends Model{
         return "admin";
     }
     
-    public function checkEntryElements(...$params){
+    public function checkEntryInputs(...$params){
         $checkedValues = [];
         foreach($params as $key){
             if (isset($key) && !empty($key)){
@@ -123,6 +123,34 @@ class AdminModel extends Model{
         }
     }
 
+    public function addMojtamaRules($inputRuleFromAdmin){
+        $currentTime = time();
+        $doesRuleExist = $this->checkIfRuleHasAdded();
+        if ($doesRuleExist == OK){
+            $query = $this->editMojtamaRules($inputRuleFromAdmin);
+            return $query ? OK : ERROR;
+        }
+        
+        $sql = "INSERT INTO mojtama_rules (rule, created_at) VALUES (?, ?)";
+        $query = $this->query($sql, "si", $inputRuleFromAdmin, $currentTime);
+        return $query ? OK : ERROR;
+    }
+
+    public function checkIfRuleHasAdded(){
+        $sql = "SELECT * FROM mojtama_rules";
+        $query = $this->mysql->query($sql);
+        if ($query->num_rows > 0){
+            return OK;
+        }else{
+            return DOES_NOT_EXIST;
+        }
+    }
+    public function editMojtamaRules($inputRuleFromAdmin){
+        $currentTime = time();
+        $sql = "UPDATE mojtama_rules SET rule = ?, edited_at = ?";
+        $query = $this->query($sql, "sd", $inputRuleFromAdmin, $currentTime);
+        return $query;
+    }
 
 
 
