@@ -25,7 +25,7 @@ class DB {
         $query = $this->mysql->prepare($sql);
         $query->bind_param($types, ...$values);
         $query->execute();
-        return $query ? true : false; //the query type is mysqli_stmt that's why i wrote it like this.
+        return $query; //the query type is mysqli_stmt that's why i wrote it like this.
     }
 
 
