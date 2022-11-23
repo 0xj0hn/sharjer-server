@@ -145,11 +145,24 @@ class AdminModel extends Model{
             return DOES_NOT_EXIST;
         }
     }
+    
     public function editMojtamaRules($inputRuleFromAdmin){
         $currentTime = time();
         $sql = "UPDATE mojtama_rules SET rule = ?, edited_at = ?";
         $query = $this->query($sql, "sd", $inputRuleFromAdmin, $currentTime);
         return $query;
+    }
+
+    public function addMojtamaFinancialStatus($jsonData){
+        // $jsonFinancialStatus:
+        // [
+        //  {'title': 'test', 'price':'100000'},
+        //  {'title': 'test2', 'price': '200000'}
+        // ]
+        $fileName = "financial_status.json";
+        $file = fopen($fileName, "w");
+        fwrite($file, json_encode($jsonFinancialStatus));
+        fclose($file);
     }
 
 

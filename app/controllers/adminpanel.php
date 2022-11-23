@@ -88,6 +88,28 @@ class AdminPanel extends Controller{
         $this->view("json", $result);
     }
 
+    public function add_mojtama_financial_status(){
+        $username = $_POST["username"];
+        $password = $_POST["password"];
+        $financialStatusByJson = $_POST["financial_json"];
+
+        $model = $this->model('admin');
+        $isChecked = $model->checkEntryInputs($username, $password, $financialStatus);
+        if ($isChecked){
+            $model->addMojtamaFinancialStatus($financialStatusByJson);
+            $result = [
+                "status" => "success",
+                "message" => "financial status added"
+            ];
+        }else{
+            $result = [
+                "status" => "error",
+                "message" => "You haven't specified inputs"
+            ];
+        }
+        $this->view("json", $result);
+    }
+
 }
 
 
