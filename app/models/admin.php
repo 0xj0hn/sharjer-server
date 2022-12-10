@@ -1,9 +1,5 @@
 <?php 
 class AdminModel extends Model{
-    public function getAdmin(){
-        return "admin";
-    }
-    
     public function checkEntryInputs(...$params){
         $checkedValues = [];
         foreach($params as $key){
