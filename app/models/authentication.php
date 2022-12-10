@@ -32,9 +32,9 @@ class AuthenticationModel extends Model{
         if ($isCheckRequiredElements != true) return false; 
         $isValidatedNeededElements = $this->validatePhoneUserBluckVahed();
         $checkEndDate = (isset($data['end_date']) && !empty($data['end_date']));
-        echo $checkEndDate;
-        $enddate = $checkEndDate ? $data['end_date'] : ""; //TODO: implement it
-        if ($isValidatedNeededElements){
+        $enddate = $checkEndDate ? $data['end_date'] : "";
+        $userExists = $this->checkIfUserExists($data['username']);
+        if ($isValidatedNeededElements && !$userExists){
             $password = md5($data['password']);
             $sql = "INSERT INTO users (username, password, name, family, phone, phone2, bluck, vahed, startdate, enddate, is_owner, car_plate, family_members) VALUES 
 (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -56,16 +56,20 @@ class AuthenticationModel extends Model{
             );
             return $query ? true : false;
         }else{
+            if ($userExists) return -1;
+            if ($isValidatedNeededElements) return -2;
             return false;
         }
     }
 
+
+
     public function validatePhoneUserBluckVahed(){
-        $validateUsername = Validator::validateUsername($this->data["username"]); // true
-        $validatePhone1 = Validator::validatePhone($this->data["phone"]); //true
-        $validatePhone2 = Validator::validatePhone($this->data["phone2"]); //true
-        $validateBluck = Validator::validateBluckOrVahed($this->data["bluck"]); // false
-        $validateVahed = Validator::validateBluckOrVahed($this->data["vahed"]); //true
+        $validateUsername = Validator::validateUsername($this->data["username"]); 
+        $validatePhone1 = Validator::validatePhone($this->data["phone"]); 
+        $validatePhone2 = Validator::validatePhone($this->data["phone2"]); 
+        $validateBluck = Validator::validateBluckOrVahed($this->data["bluck"]); 
+        $validateVahed = Validator::validateBluckOrVahed($this->data["vahed"]);
         if ($validateUsername &&
             $validatePhone1 &&
             $validatePhone2 &&
@@ -76,6 +80,14 @@ class AuthenticationModel extends Model{
         }else{
             return false;
         }
+    }
+
+    public function checkIfUserExists($username){
+        $sql = "SELECT * FROM users WHERE username = ?";
+        $query = $this->query($sql, "s", $username);
+        $result = $query->get_result();
+        if ($result->num_rows == 0) return false;
+        return true;
     }
 }
 ?>
