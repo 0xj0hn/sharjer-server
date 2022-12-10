@@ -11,10 +11,16 @@ class Authentication extends Controller{
         $isSignedUp = $model->signUp($this->data);
 
         $result = [];
-        if ($isSignedUp == true){
+        if ($isSignedUp == 1){
             $result = [
                 "status" => "success",
                 "message" => "user has signed up in database."
+            ];
+        }
+        else if ($isSignedUp == -1){
+            $result = [
+                "status" => "error",
+                "message" => "user is in the database"
             ];
         }
         else{
