@@ -1,5 +1,6 @@
 <?php 
 include "./app/core/App.php";
+include "./app/core/Validator.php";
 include "./app/core/Controller.php";
 include "./app/core/DB.php";
 include "./app/core/Model.php";
