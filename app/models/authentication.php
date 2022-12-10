@@ -57,7 +57,6 @@ class AuthenticationModel extends Model{
             return $query ? true : false;
         }else{
             if ($userExists) return -1;
-            if ($isValidatedNeededElements) return -2;
             return false;
         }
     }
