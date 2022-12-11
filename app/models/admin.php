@@ -1,30 +1,18 @@
 <?php 
 class AdminModel extends Model{
-    public function checkEntryInputs(...$params){
-        $checkedValues = [];
-        foreach($params as $key){
-            if (isset($key) && !empty($key)){
-                array_push($checkedValues, $key);
+    public function checkFullAdmin($username, $password){
+        $sql = "SELECT * FROM users WHERE username = ? AND password = ?";
+        $res = $this->query($sql, "ss", $username, $password)->get_result();
+        if ($res->num_rows > 0){
+            while ($row = $res->fetch_assoc()){
+                if ($row["is_admin"] == "full"){
+                    return true;
+                }else{
+                    return false;
+                }
             }
         }
-        if (count($checkedValues) == count($params)){
-            return OK;
-        }else{
-            return ERROR;
-        }
-    }
-
-    public function checkFullAdmin($username){
-        $sql = "SELECT * FROM users WHERE username = '$username'";
-        $res = $this->mysql->query($sql);
-        while ($row = $res->fetch_assoc()){
-            if ($row["is_admin"] == "full"){
-                return OK;
-            }else{
-                return ERROR;
-            }
-        }
-        return DOES_NOT_EXIST;
+        return false;
     }
 
     public function updateMonth($month){
@@ -80,15 +68,12 @@ class AdminModel extends Model{
     }
 
     public function getInformationOfTheUser($targetUsername){
-        $sql = "SELECT * FROM users WHERE username = '$targetUsername'";
-        $query = $this->mysql->query($sql);
+        $sql = "SELECT * FROM users WHERE username = ?";
+        $query = $this->query($sql, "s", $targetUsername);
+        $result = $query->get_result();
         $resultArray = [];
-        if ($query->num_rows > 0){
+        if ($result->num_rows > 0){ // TODO: should be checked
             while ($row = $query->fetch_assoc()){
-                //row contains these keys: 
-                //"username", "password",
-                //"name", "family","phone",
-                //"bluck", "vahed", "startdate", "enddate"
                 return $row; 
             }
         }else{
@@ -161,6 +146,11 @@ class AdminModel extends Model{
         fclose($file);
     }
 
+    public function removeUser($username){
+        $sql = "DELETE FROM `users` WHERE `users`.`username` = ?";
+        $query = $this->query($sql, "s", $username);
+        return $query ? true : false;
+    }
 
 
 }
