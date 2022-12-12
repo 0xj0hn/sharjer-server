@@ -3,11 +3,21 @@
 
 class DB {
     protected $mysql;
+    protected $dbinformation;
     public function __construct(){ //WE HAVE TO CHANGE THIS SECTION LATER.
         $host = "localhost";
         $username = "root";
         $password = "Mhdmhdmhd82@#";
         $dbname = "amoli";
+        $this->dbinformation = (object)[
+            "host" => $host,
+            "username" => $username,
+            "password" => $password,
+            "dbname" => $dbname,
+            "blucks" => [
+                1,2,3
+            ]
+        ];
 
         $this->mysql = new mysqli($host, $username, $password, $dbname);
         if ($this->mysql->connect_error){
