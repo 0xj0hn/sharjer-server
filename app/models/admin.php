@@ -134,7 +134,7 @@ class AdminModel extends Model{
         return $query;
     }
 
-    public function addMojtamaFinancialStatus($jsonData){
+    public function addMojtamaFinancialStatus($jsonFinancialStatus){
         // $jsonFinancialStatus:
         // [
         //  {'title': 'test', 'price':'100000'},
