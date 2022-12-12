@@ -155,19 +155,11 @@ class AdminPanel extends Controller{
             $password = $_POST["password"];
             $financialStatusByJson = $_POST["financial_json"];
             $model = $this->model('admin');
-            $isChecked = $model->checkEntryInputs($username, $password, $financialStatus);
-            if ($isChecked){
-                $model->addMojtamaFinancialStatus($financialStatusByJson);
-                $result = [
-                    "status" => "success",
-                    "message" => "financial status added"
-                ];
-            }else{
-                $result = [
-                    "status" => "error",
-                    "message" => "you haven't specified inputs"
-                ];
-            }
+            $model->addMojtamaFinancialStatus($financialStatusByJson);
+            $result = [
+                "status" => "success",
+                "message" => "financial status added"
+            ];
         }else{
             $result = [
                 "status" => "error",
