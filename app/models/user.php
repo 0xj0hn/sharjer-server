@@ -1,6 +1,20 @@
 <?php
 
 class UserModel extends Model{
+    public function getUserInformation($username, $password){
+        $sql = "SELECT * FROM users WHERE username = ? AND password = ?";
+        $query = $this->query($sql, "ss", $username, $password);
+        $result = $query->get_result();
+        $retValue = [];
+        if ($result->num_rows > 0){
+            while($row = $result->fetch_assoc()){
+                $retValue = $row;
+            }
+        }else{
+            return 0;
+        }
+        return (object)$retValue;
+    }
     public function getFinancialStatus(){
         $fileName = "financial_status.json";
         $file = fopen($fileName, "r");
