@@ -54,9 +54,9 @@ class PaymentModel extends Model {
                 return "وضعیت مشخص شده معتبر نیست";
         }
     }
+
     public function isChargePaid($year, $month, $bluck, $vahed){
         $sql = "SELECT * FROM bluck$bluck" . "_$year " . "WHERE `واحد` = $vahed";
-        echo $sql;
         $query = $this->mysql->query($sql);
         if ($query->num_rows > 0){
             while ($row = $query->fetch_assoc()){
@@ -67,6 +67,7 @@ class PaymentModel extends Model {
             return false;
         }
     }
+
     public function getCurrentPrice(){
         $sql = "SELECT sharge_price FROM price";
         $query = $this->mysql->query($sql);
@@ -82,16 +83,12 @@ class PaymentModel extends Model {
         $bluck = $userInfo->bluck;
         $vahed = $userInfo->vahed;
         $statuses = [];
-        if ($price == null){
-            $price = $this->getCurrentPrice();
-        }
         $sql = "UPDATE bluck$bluck"."_$year SET `$month` = '$price' WHERE `واحد` = '$vahed'";
         try{
             $prepare = $this->prepareRowForCharge($bluck, $vahed, $year);
             $update = $this->updateChargeMonth($bluck, $vahed, $year, $month, $price);
             array_push($statuses, $prepare, $update);
         }catch(Exception $e){
-            echo $e->getMessage();
             $update = $this->updateChargeMonth($bluck, $vahed, $year, $month, $price);
             array_push($statuses, $update);
         }
