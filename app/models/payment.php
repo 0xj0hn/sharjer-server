@@ -102,9 +102,33 @@ class PaymentModel extends Model {
     }
 
     public function updateChargeMonth($bluck, $vahed, $year, $month, $price){
-        $sql = "UPDATE bluck$bluck"."_$year SET `$month` = '$price' WHERE `واحد` = '$vahed'";
-        $query = $this->mysql->query($sql);
+        $sql = "UPDATE bluck$bluck"."_$year SET `$month` = ? WHERE `واحد` = ?";
+        $query = $this->query($sql, "si", $price, $vahed);
         return $query;
+    }
+
+    public function sumChargesUp($year, $bluck, $vahed){
+        $sql = "SELECT * FROM bluck$bluck"."_$year WHERE `واحد` = ?";
+        $query = $this->query($sql, "i", $vahed);
+        $result = $query->get_result();
+        $prices = [];
+        $sumOfPrices = 0;
+        if ($result->num_rows > 0){
+            while($row = $result->fetch_assoc()){
+                $rowLength = count($row);
+                foreach($row as $key => $value){
+                    if ($key == "واحد" || $key == "جمع") continue; //we split واحد from prices.
+                    array_push($prices, $value);
+                }
+            }
+            $sumOfPrices = array_sum($prices);
+        }else{
+            return false;
+        }
+        unset($query, $sql);
+        $sql = "UPDATE bluck$bluck"."_$year SET `جمع` = ? WHERE `واحد` = ?";
+        $query = $this->query($sql, "si", $sumOfPrices, $vahed);
+        return $query ? true : false;
     }
 }
 
