@@ -130,7 +130,47 @@ class PaymentModel extends Model {
         $query = $this->query($sql, "si", $sumOfPrices, $vahed);
         return $query ? true : false;
     }
+
+    public function generatePriceByCustomChargeJson($userInfo, $jsonData, $infoFileContent){
+        $prices = [];
+        $bluck = $userInfo->bluck;
+        $vahed = $userInfo->vahed;
+        $sumOfPrices = 0;
+        // $jsonDataDecoded must be like the following structure:
+        //  [
+        //      [
+        //          year,
+        //          [month, month2, month3]
+        //      ],
+        //      [...],
+        //      [...]
+        //  ]
+        $jsonDataDecoded = json_decode($jsonData, true);
+        $infoFileContentDecoded = json_decode($infoFileContent, true);
+        sort($jsonDataDecoded);
+        ksort($infoFileContentDecoded);
+        $i = 0;
+        foreach($jsonDataDecoded as $chargeData){
+            $data = ChargeInfo::fromJson($chargeData);
+            $year = $data->year;
+            $months = $data->months;
+            foreach($months as $month){
+                $yearExists = array_key_exists($year, $infoFileContentDecoded);
+                $monthsInInfoFile = array_keys($infoFileContentDecoded[$year]);
+                var_dump($monthsInInfoFile);
+                $monthExists = array_search($month, $monthsInInfoFile);
+                $chargePaid = $this->isChargePaid($year, $month, $bluck, $vahed);
+                if ($yearExists && $monthExists !== false){
+                    $price = $infoFileContentDecoded[$year][$month];
+                    var_dump($price);
+                    array_push($prices, $price);
+                }else{
+                    return false;
+                }
+            }
+        }
+        $sumOfPrices = array_sum($prices);
+        return $sumOfPrices;
+    }
 }
-
-
 ?>
