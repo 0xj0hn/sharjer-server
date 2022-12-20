@@ -1,5 +1,13 @@
-.center{
+.center {
     direction: rtl;
     text-align: center;
     justify-content: center;
+}
+
+.success-title {
+    color: green;
+}
+
+.error-title {
+    color: red;
 }

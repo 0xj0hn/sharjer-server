@@ -82,17 +82,15 @@ class PaymentModel extends Model {
     public function payCharge($userInfo, $price=null, $year, $month){
         $bluck = $userInfo->bluck;
         $vahed = $userInfo->vahed;
-        $statuses = [];
         $sql = "UPDATE bluck$bluck"."_$year SET `$month` = '$price' WHERE `واحد` = '$vahed'";
         try{
             $prepare = $this->prepareRowForCharge($bluck, $vahed, $year);
             $update = $this->updateChargeMonth($bluck, $vahed, $year, $month, $price);
-            array_push($statuses, $prepare, $update);
         }catch(Exception $e){
             $update = $this->updateChargeMonth($bluck, $vahed, $year, $month, $price);
-            array_push($statuses, $update);
         }
-        return $statuses;
+        $this->sumChargesUp($year, $bluck, $vahed);
+        return true;
     }
 
     public function prepareRowForCharge($bluck, $vahed, $year){
@@ -157,12 +155,14 @@ class PaymentModel extends Model {
             foreach($months as $month){
                 $yearExists = array_key_exists($year, $infoFileContentDecoded);
                 $monthsInInfoFile = array_keys($infoFileContentDecoded[$year]);
-                var_dump($monthsInInfoFile);
                 $monthExists = array_search($month, $monthsInInfoFile);
                 $chargePaid = $this->isChargePaid($year, $month, $bluck, $vahed);
                 if ($yearExists && $monthExists !== false){
-                    $price = $infoFileContentDecoded[$year][$month];
-                    var_dump($price);
+                    if (!$chargePaid){
+                        $price = $infoFileContentDecoded[$year][$month];
+                    }else{
+                        $price = 0;
+                    }
                     array_push($prices, $price);
                 }else{
                     return false;
@@ -172,5 +172,51 @@ class PaymentModel extends Model {
         $sumOfPrices = array_sum($prices);
         return $sumOfPrices;
     }
+
+    public function payCustomCharge($userInfo, $jsonData){
+        $bluck = $userInfo->bluck;
+        $vahed = $userInfo->vahed;
+        $json = json_decode($jsonData);
+        $monthsPaid = [];
+        foreach($json as $chargeData){
+            $charge = ChargeInfo::fromJson($chargeData);
+            $year = $charge->year;
+            $months = $charge->months;
+            foreach($months as $month){
+                $chargePaid = $this->isChargePaid($year, $month, $bluck, $vahed);
+                if (!$chargePaid){
+                    $chargePrice = $this->getChargeOfDate($year, $month);
+                    $payment = $this->payCharge($userInfo, $chargePrice, $year, $month);
+                    $sumChargesUp = $this->sumChargesUp($year, $bluck, $vahed);
+                    array_push($monthsPaid, $month);
+                }else{
+                }
+            }
+        }
+        $monthsPaidMessage = join("، ", array_map(function($month){
+            return $month;
+        }, $monthsPaid));
+        return $monthsPaidMessage;
+    }
+
+    public function getChargeOfDate($year, $month){
+        $infoFileName = "chargePricesInfo.json";
+        $infoFile = fopen($infoFileName, "r");
+        $infoFileContent = fread($infoFile, filesize($infoFileName));
+        fclose($infoFile);
+        $infoFileContentDecoded = json_decode($infoFileContent, true);
+        $years = array_keys($infoFileContentDecoded);
+        $yearExists = array_search($year, $years);
+        if ($yearExists === false) return false;
+        $monthsInInfoFile = array_keys($infoFileContentDecoded[$year]);
+        $monthExists = array_search($month, $monthsInInfoFile);
+        if (isset($monthExists)){
+            $price = $infoFileContentDecoded[$year][$month];
+            return $price;
+        }else {
+            return false;
+        }
+    }
+
 }
 ?>

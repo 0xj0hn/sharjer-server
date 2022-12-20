@@ -6,9 +6,11 @@ class Validator {
         $checkedValues = [];
         if (empty($data)) return false;
         foreach($keyList as $key){
-            $element = $data["$key"];
-            if(isset($element) && !empty($element)){
-                array_push($checkedValues, $element);
+            if (array_key_exists($key, $data)){
+                $element = $data["$key"];
+                if(isset($element)){
+                    array_push($checkedValues, $element);
+                }
             }
         }
         if (count($checkedValues) == count($keyList)){
