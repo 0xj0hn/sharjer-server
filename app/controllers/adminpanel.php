@@ -217,6 +217,12 @@ class AdminPanel extends Controller{
         $this->view("json", $result);
     }
 
+    public function users(){
+        $model = $this->model("admin");
+        $ans = $model->showInformationOfUsers();
+        $this->view("json", $ans);
+    }
+
 }
 
 

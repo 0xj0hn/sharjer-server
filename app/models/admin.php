@@ -152,6 +152,19 @@ class AdminModel extends Model{
         return $query ? true : false;
     }
 
+    public function showInformationOfUsers(){
+        $sql = "SELECT * FROM users";
+        $query = $this->mysql->query($sql);
+        $rows = [];
+        if ($query->num_rows > 0){
+            while($row = $query->fetch_assoc()){
+                array_push($rows, $row);
+            }
+            return $rows;
+        }else{
+            return false;
+        }
+    }
 
 }
 
