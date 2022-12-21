@@ -54,6 +54,12 @@ class User extends Controller{
         $this->view("json", $result);
     }
 
+    public function app_version(){
+        $model = $this->model("user");
+        $res = $model->getApplicationVersion();
+        $this->view("json", $res);
+    }
+
 }
 
 
