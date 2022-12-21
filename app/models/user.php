@@ -112,6 +112,18 @@ class UserModel extends Model{
         $years = array_unique($years);
         return $years;
     }
+
+    public function getApplicationVersion(){
+        $sql = "SELECT * FROM app_version";
+        $query = $this->mysql->query($sql);
+        if ($query->num_rows > 0){
+            while($row = $query->fetch_assoc()){
+                return $row;
+            }
+        }else{
+            return false;
+        }
+    }
 }
 
 
