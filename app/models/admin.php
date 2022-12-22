@@ -23,7 +23,7 @@ class AdminModel extends Model{
 
     public function changePrice($price){
         $price = $price . "0";
-        $sql = "UPDATE price SET `sharge_price` = ?";
+        $sql = "UPDATE charge SET price = ?";
         $query = $this->query($sql, "s", $price);
         return $query ? true : false;
     }
