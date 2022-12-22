@@ -5,13 +5,20 @@ class AdminPanel extends Controller{
     public function update_month(...$params){
         $model = $this->model('admin');
         $month = $params[0];
-        $update = $model->updateMonth($params[0]);
+        if($month){
+            $update = $model->updateMonth($month);
+            $result = [
+                "status" => "success",
+                "message" => "month was updated"
+            ];
+            $this->view("json", $result);
+        }
     }
 
     public function update_price(...$params){
         $model = $this->model('admin');
         if ($params[0]){
-            $update = $model->updateMonth($params[0]);
+            $update = $model->updatePrice($params[0]);
             $result = [
                 "status" => "success",
                 "message" => "successfuly changed month"
