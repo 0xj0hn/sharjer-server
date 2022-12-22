@@ -69,7 +69,7 @@ class PaymentModel extends Model {
     }
 
     public function getCurrentPrice(){
-        $sql = "SELECT sharge_price FROM price";
+        $sql = "SELECT price FROM charge";
         $query = $this->mysql->query($sql);
         if ($query->num_rows > 0){
             while($row = $query->fetch_array()){
