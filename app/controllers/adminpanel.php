@@ -5,26 +5,73 @@ class AdminPanel extends Controller{
     public function update_month(...$params){
         $model = $this->model('admin');
         $month = $params[0];
+        $validateParams = Validator::validateElements($_POST, [
+            'username',
+            'password'
+        ]);
         if($month){
-            $update = $model->updateMonth($month);
-            $result = [
-                "status" => "success",
-                "message" => "month was updated"
-            ];
+            if ($validateParams){
+                $username = $_POST["username"];
+                $password = $_POST["password"];
+                $isAdmin = $model->checkFullAdmin($username, $password);
+                if ($isAdmin){
+                    $update = $model->updateMonth($month);
+                    $result = [
+                        "status" => "success",
+                        "message" => "month was updated"
+                    ];
+                }else{
+                    $result = [
+                        "status" => "error",
+                        "message" => "permission denied"
+                    ];
+                }
+            }else{
+                $result = [
+                    "status" => "success",
+                    "message" => "username or password wasn't provided"
+                ];
+            }
             $this->view("json", $result);
         }
     }
 
     public function update_price(...$params){
         $model = $this->model('admin');
-        if ($params[0]){
-            $update = $model->updatePrice($params[0]);
-            $result = [
-                "status" => "success",
-                "message" => "successfuly changed month"
-            ];
-            $this->view("json", $result);
+        $validateParams = Validator::validateElements($_POST, [
+            'username',
+            'password'
+        ]);
+        if ($params[0] && $validateParams){
+            $username = $_POST["username"];
+            $password = $_POST["password"];
+            $isAdmin = $model->checkFullAdmin($username, $password);
+            if ($isAdmin){
+                $update = $model->updatePrice($params[0]);
+                $result = [
+                    "status" => "success",
+                    "message" => "successfuly changed month"
+                ];
+            }else{
+                $result = [
+                    "status" => "success",
+                    "message" => "permission denied"
+                ];
+            }
+        }else{
+            if (!$validateParams){
+                $result = [
+                    'status' => "error",
+                    "message" => "username or password wasn't provided"
+                ];
+            }else{
+                $result = [
+                    "status" => "error",
+                    "message" => "param number one, wasn't provided"
+                ];
+            }
         }
+        $this->view("json", $result);
     }
 
     public function change_privilege(...$params){
