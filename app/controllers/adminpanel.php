@@ -180,7 +180,7 @@ class AdminPanel extends Controller{
             $isOK = $model->addMojtamaRules($rule);
             if ($isOK){
                 $result = [
-                    "status" => "ok",
+                    "status" => "success",
                     "message" => "rule added"
                 ];
             }else{
