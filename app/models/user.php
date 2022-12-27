@@ -110,6 +110,7 @@ class UserModel extends Model{
             return false;
         }
         $years = array_unique($years);
+        rsort($years);
         return $years;
     }
 
@@ -123,6 +124,20 @@ class UserModel extends Model{
         }else{
             return false;
         }
+    }
+
+    public function getUserPayStat($bluck, $vahed){
+        $years = $this->getYears();
+        $results = [];
+        foreach($years as $year){
+            $sql = "SELECT * FROM bluck$bluck"."_$year WHERE `واحد` = ?";
+            $query = $this->query($sql, "i", $vahed);
+            $result = $query->get_result();
+            while($row = $result->fetch_assoc()){
+                array_push($results, ["$year" => $row]);
+            }
+        }
+        return $results;
     }
 }
 
