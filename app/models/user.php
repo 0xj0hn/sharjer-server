@@ -134,7 +134,8 @@ class UserModel extends Model{
             $query = $this->query($sql, "i", $vahed);
             $result = $query->get_result();
             while($row = $result->fetch_assoc()){
-                array_push($results, ["$year" => $row]);
+                $yearWrapperArr = array($year => $row);
+                $results[] = $yearWrapperArr;
             }
         }
         return $results;

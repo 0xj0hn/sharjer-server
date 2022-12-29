@@ -67,9 +67,6 @@ class User extends Controller{
             "username",
             "password"
         ]);
-        $bluck = 1;
-        $vahed = 13;
-        $result = $model->getUserPayStat($bluck, $vahed);
         if ($validate){
             $username = $_POST["username"];
             $password = $_POST["password"];
@@ -80,6 +77,9 @@ class User extends Controller{
                     "message" => "login failed"
                 ];
             }else{
+                $bluck = $userInfo->bluck;
+                $vahed = $userInfo->vahed;
+                $result = $model->getUserPayStat($bluck, $vahed);
             }
         }else{
             $result = [
