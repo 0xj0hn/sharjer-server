@@ -90,6 +90,11 @@ class User extends Controller{
         $this->view("json", $result);
     }
 
+    public function get_years(){
+        $model = $this->model('user');
+        $years = $model->getYears();
+        $this->view("json", $years);
+    }
 }
 
 
