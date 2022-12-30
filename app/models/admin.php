@@ -56,6 +56,14 @@ class AdminModel extends Model{
         return $arr;
     }
 
+    public function addChargeToTheUser($targetUsername, $year, $month){
+        $userInfo= $this->getInformationOfTheUser($targetUsername);
+        $bluck = $userInfo["bluck"];
+        $vahed = $userInfo["vahed"];
+        $payment = new PaymentModel();
+        $payment->payCharge(object($userInfo), null, $year, $month);
+    }
+
     public function removeChargeOfTheUser($targetUsername, $year, $month){
         $userInformation = $this->getInformationOfTheUser($targetUsername);
         $bluck = $userInformation["bluck"];

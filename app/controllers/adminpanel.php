@@ -92,33 +92,30 @@ class AdminPanel extends Controller{
         }
     }
 
-    public function get_members(...$params){
-        $model = $this->model('admin');
-        if ($params[0] && $params[1]){
-            echo "There are two params : {$params[0]}, {$params[1]}";
-        }else{
-            echo "there is nothing here.";
-        }
-    }
-
     public function add_charge_to_user(){
         $postParams = $_POST;
         $model = $this->model('admin');
         $isChecked = Validator::validateElements($postParams, [
             'username',
+            'password',
             'target_username',
             'year',
             'month'
         ]);
         if ($isChecked){
             $username = $_POST["username"];
-            $targetUsername = $_POST["target_username"];
-            $year = $_POST["year"];
-            $month = $_POST["month"];
-            $result = [
-                "status" => "success",
-                "message" => "charge added to $targetUsername"
-            ];
+            $password = $_POST["password"];
+            $isAdmin = $model->checkFullAdmin($username, $password);
+            if ($isAdmin){
+                $targetUsername = $_POST["target_username"];
+                $year = $_POST["year"];
+                $month = $_POST["month"];
+                $model->addChargeToTheUser($targetUsername, $year, $month);
+                $result = [
+                    "status" => "success",
+                    "message" => "charge added to $targetUsername"
+                ];
+            }
         }else{
             $result = [
                 "status" => "error",
