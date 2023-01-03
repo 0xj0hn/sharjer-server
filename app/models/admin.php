@@ -60,8 +60,14 @@ class AdminModel extends Model{
         $userInfo= $this->getInformationOfTheUser($targetUsername);
         $bluck = $userInfo["bluck"];
         $vahed = $userInfo["vahed"];
-        $payment = new PaymentModel();
-        $payment->payCharge(object($userInfo), null, $year, $month);
+        include_once "app/models/payment.php";
+        $paymentModel = new PaymentModel;
+        $chargePrice = $paymentModel->getChargeOfDate($year, $month);
+        if ($chargePrice){
+            return $paymentModel->payCharge((object)$userInfo, $chargePrice, $year, $month);
+        }else{
+            return false;
+        }
     }
 
     public function removeChargeOfTheUser($targetUsername, $year, $month){
@@ -81,7 +87,7 @@ class AdminModel extends Model{
         $result = $query->get_result();
         $resultArray = [];
         if ($result->num_rows > 0){ // TODO: should be checked
-            while ($row = $query->fetch_assoc()){
+            while ($row = $result->fetch_assoc()){
                 return $row; 
             }
         }else{
