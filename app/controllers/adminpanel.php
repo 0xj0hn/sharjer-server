@@ -5,19 +5,73 @@ class AdminPanel extends Controller{
     public function update_month(...$params){
         $model = $this->model('admin');
         $month = $params[0];
-        $update = $model->updateMonth($params[0]);
+        $validateParams = Validator::validateElements($_POST, [
+            'username',
+            'password'
+        ]);
+        if($month){
+            if ($validateParams){
+                $username = $_POST["username"];
+                $password = $_POST["password"];
+                $isAdmin = $model->checkFullAdmin($username, $password);
+                if ($isAdmin){
+                    $update = $model->updateMonth($month);
+                    $result = [
+                        "status" => "success",
+                        "message" => "month was updated"
+                    ];
+                }else{
+                    $result = [
+                        "status" => "error",
+                        "message" => "permission denied"
+                    ];
+                }
+            }else{
+                $result = [
+                    "status" => "success",
+                    "message" => "username or password wasn't provided"
+                ];
+            }
+            $this->view("json", $result);
+        }
     }
 
     public function update_price(...$params){
         $model = $this->model('admin');
-        if ($params[0]){
-            $update = $model->updateMonth($params[0]);
-            $result = [
-                "status" => "success",
-                "message" => "successfuly changed month"
-            ];
-            $this->view("json", $result);
+        $validateParams = Validator::validateElements($_POST, [
+            'username',
+            'password'
+        ]);
+        if ($params[0] && $validateParams){
+            $username = $_POST["username"];
+            $password = $_POST["password"];
+            $isAdmin = $model->checkFullAdmin($username, $password);
+            if ($isAdmin){
+                $update = $model->updatePrice($params[0]);
+                $result = [
+                    "status" => "success",
+                    "message" => "successfuly changed month"
+                ];
+            }else{
+                $result = [
+                    "status" => "success",
+                    "message" => "permission denied"
+                ];
+            }
+        }else{
+            if (!$validateParams){
+                $result = [
+                    'status' => "error",
+                    "message" => "username or password wasn't provided"
+                ];
+            }else{
+                $result = [
+                    "status" => "error",
+                    "message" => "param number one, wasn't provided"
+                ];
+            }
         }
+        $this->view("json", $result);
     }
 
     public function change_privilege(...$params){
@@ -38,33 +92,30 @@ class AdminPanel extends Controller{
         }
     }
 
-    public function get_members(...$params){
-        $model = $this->model('admin');
-        if ($params[0] && $params[1]){
-            echo "There are two params : {$params[0]}, {$params[1]}";
-        }else{
-            echo "there is nothing here.";
-        }
-    }
-
     public function add_charge_to_user(){
         $postParams = $_POST;
         $model = $this->model('admin');
         $isChecked = Validator::validateElements($postParams, [
             'username',
+            'password',
             'target_username',
             'year',
             'month'
         ]);
         if ($isChecked){
             $username = $_POST["username"];
-            $targetUsername = $_POST["target_username"];
-            $year = $_POST["year"];
-            $month = $_POST["month"];
-            $result = [
-                "status" => "success",
-                "message" => "charge added to $targetUsername"
-            ];
+            $password = $_POST["password"];
+            $isAdmin = $model->checkFullAdmin($username, $password);
+            if ($isAdmin){
+                $targetUsername = $_POST["target_username"];
+                $year = $_POST["year"];
+                $month = $_POST["month"];
+                $model->addChargeToTheUser($targetUsername, $year, $month);
+                $result = [
+                    "status" => "success",
+                    "message" => "charge added to $targetUsername"
+                ];
+            }
         }else{
             $result = [
                 "status" => "error",
@@ -72,6 +123,52 @@ class AdminPanel extends Controller{
             ];
         }
         $this->view("json", $result);
+    }
+
+    public function add_multiple_charge_to_user(){
+        $results = [];
+        $model = $this->model("admin");
+        $validate = Validator::validateElements($_POST, [
+            "username",
+            "password",
+            "target_username",
+            "json"
+        ]);
+        if ($validate){
+            $username = $_POST["username"];
+            $password = $_POST["password"];
+            $isAdmin = $model->checkFullAdmin($username, $password);
+            if ($isAdmin){
+                $targetUsername = $_POST["target_username"];
+                $jsonValue = $_POST["json"];
+                $decodedJson = json_decode($jsonValue, true);
+                $year = $decodedJson[0];
+                $monthsArr = $decodedJson[1];
+                $monthsAddedArr = [];
+                foreach($monthsArr as $month){
+                    $isChargeAdded = $model->addChargeToTheUser($targetUsername, $year, $month); //TODO
+                    if ($isChargeAdded){
+                        $monthsAddedArr[] = $month;
+                    }
+                }
+                $results = [
+                    "status" => "success",
+                    "message" => "charges were added",
+                    "months" => implode(", ", $monthsAddedArr)
+                ];
+            }else{
+                $results = [
+                    "status" => "error",
+                    "message" => "permission denied"
+                ];
+            }
+        }else{
+            $results = [
+                "status" => "error",
+                "message" => "validation failed"
+            ];
+        }
+        $this->view('json', $results);
     }
 
     public function remove_charge_from_user(){
@@ -126,7 +223,7 @@ class AdminPanel extends Controller{
             $isOK = $model->addMojtamaRules($rule);
             if ($isOK){
                 $result = [
-                    "status" => "ok",
+                    "status" => "success",
                     "message" => "rule added"
                 ];
             }else{

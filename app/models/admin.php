@@ -21,9 +21,9 @@ class AdminModel extends Model{
         return $res ? true : false;
     }
 
-    public function changePrice($price){
+    public function updatePrice($price){
         $price = $price . "0";
-        $sql = "UPDATE price SET `sharge_price` = ?";
+        $sql = "UPDATE charge SET price = ?";
         $query = $this->query($sql, "s", $price);
         return $query ? true : false;
     }
@@ -56,12 +56,26 @@ class AdminModel extends Model{
         return $arr;
     }
 
+    public function addChargeToTheUser($targetUsername, $year, $month){
+        $userInfo= $this->getInformationOfTheUser($targetUsername);
+        $bluck = $userInfo["bluck"];
+        $vahed = $userInfo["vahed"];
+        include_once "app/models/payment.php";
+        $paymentModel = new PaymentModel;
+        $chargePrice = $paymentModel->getChargeOfDate($year, $month);
+        if ($chargePrice){
+            return $paymentModel->payCharge((object)$userInfo, $chargePrice, $year, $month);
+        }else{
+            return false;
+        }
+    }
+
     public function removeChargeOfTheUser($targetUsername, $year, $month){
         $userInformation = $this->getInformationOfTheUser($targetUsername);
         $bluck = $userInformation["bluck"];
         $vahed = $userInformation["vahed"];
-        $sql = "UPDATE bluck" . $bluck . "_" . $year . " SET `$month` = ?";
-        $query = $this->query($sql, "s", 0); //set zero as charge
+        $sql = "UPDATE bluck" . $bluck . "_" . $year . " SET `$month` = ? WHERE `واحد` = ?";
+        $query = $this->query($sql, "si", 0, $vahed); //set zero as charge
         $this->setSumOfChargesInDB($targetUsername, $year);
         
         return $query ? OK : ERROR;
@@ -73,7 +87,7 @@ class AdminModel extends Model{
         $result = $query->get_result();
         $resultArray = [];
         if ($result->num_rows > 0){ // TODO: should be checked
-            while ($row = $query->fetch_assoc()){
+            while ($row = $result->fetch_assoc()){
                 return $row; 
             }
         }else{

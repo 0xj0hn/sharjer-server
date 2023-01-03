@@ -69,7 +69,7 @@ class PaymentModel extends Model {
     }
 
     public function getCurrentPrice(){
-        $sql = "SELECT sharge_price FROM price";
+        $sql = "SELECT price FROM charge";
         $query = $this->mysql->query($sql);
         if ($query->num_rows > 0){
             while($row = $query->fetch_array()){
@@ -210,7 +210,10 @@ class PaymentModel extends Model {
         if ($yearExists === false) return false;
         $monthsInInfoFile = array_keys($infoFileContentDecoded[$year]);
         $monthExists = array_search($month, $monthsInInfoFile);
-        if (isset($monthExists)){
+        $givenMonthByUserExists = array_key_exists($month, $infoFileContentDecoded[$year]);
+        if (isset($monthExists) &&
+            $givenMonthByUserExists
+        ){
             $price = $infoFileContentDecoded[$year][$month];
             return $price;
         }else {

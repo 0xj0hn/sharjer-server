@@ -60,6 +60,41 @@ class User extends Controller{
         $this->view("json", $res);
     }
 
+    public function user_pay_stat(){
+        $model = $this->model("user");
+        $result = [];
+        $validate = Validator::validateElements($_POST, [
+            "username",
+            "password"
+        ]);
+        if ($validate){
+            $username = $_POST["username"];
+            $password = $_POST["password"];
+            $userInfo = $model->getUserInformation($username, $password);
+            if (!$userInfo){
+                $result = [
+                    "status" => "error",
+                    "message" => "login failed"
+                ];
+            }else{
+                $bluck = $userInfo->bluck;
+                $vahed = $userInfo->vahed;
+                $result = $model->getUserPayStat($bluck, $vahed);
+            }
+        }else{
+            $result = [
+                "status" => "error",
+                "message" => "validation failed"
+            ];
+        }
+        $this->view("json", $result);
+    }
+
+    public function get_years(){
+        $model = $this->model('user');
+        $years = $model->getYears();
+        $this->view("json", $years);
+    }
 }
 
 
