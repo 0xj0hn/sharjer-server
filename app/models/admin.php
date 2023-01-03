@@ -74,8 +74,8 @@ class AdminModel extends Model{
         $userInformation = $this->getInformationOfTheUser($targetUsername);
         $bluck = $userInformation["bluck"];
         $vahed = $userInformation["vahed"];
-        $sql = "UPDATE bluck" . $bluck . "_" . $year . " SET `$month` = ?";
-        $query = $this->query($sql, "s", 0); //set zero as charge
+        $sql = "UPDATE bluck" . $bluck . "_" . $year . " SET `$month` = ? WHERE `واحد` = ?";
+        $query = $this->query($sql, "si", 0, $vahed); //set zero as charge
         $this->setSumOfChargesInDB($targetUsername, $year);
         
         return $query ? OK : ERROR;
