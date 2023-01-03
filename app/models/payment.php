@@ -210,7 +210,10 @@ class PaymentModel extends Model {
         if ($yearExists === false) return false;
         $monthsInInfoFile = array_keys($infoFileContentDecoded[$year]);
         $monthExists = array_search($month, $monthsInInfoFile);
-        if (isset($monthExists)){
+        $givenMonthByUserExists = array_key_exists($month, $infoFileContentDecoded[$year]);
+        if (isset($monthExists) &&
+            $givenMonthByUserExists
+        ){
             $price = $infoFileContentDecoded[$year][$month];
             return $price;
         }else {

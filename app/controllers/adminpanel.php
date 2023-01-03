@@ -125,6 +125,52 @@ class AdminPanel extends Controller{
         $this->view("json", $result);
     }
 
+    public function add_multiple_charge_to_user(){
+        $results = [];
+        $model = $this->model("admin");
+        $validate = Validator::validateElements($_POST, [
+            "username",
+            "password",
+            "target_username",
+            "json"
+        ]);
+        if ($validate){
+            $username = $_POST["username"];
+            $password = $_POST["password"];
+            $isAdmin = $model->checkFullAdmin($username, $password);
+            if ($isAdmin){
+                $targetUsername = $_POST["target_username"];
+                $jsonValue = $_POST["json"];
+                $decodedJson = json_decode($jsonValue, true);
+                $year = $decodedJson[0];
+                $monthsArr = $decodedJson[1];
+                $monthsAddedArr = [];
+                foreach($monthsArr as $month){
+                    $isChargeAdded = $model->addChargeToTheUser($targetUsername, $year, $month); //TODO
+                    if ($isChargeAdded){
+                        $monthsAddedArr[] = $month;
+                    }
+                }
+                $results = [
+                    "status" => "success",
+                    "message" => "charges were added",
+                    "months" => implode(", ", $monthsAddedArr)
+                ];
+            }else{
+                $results = [
+                    "status" => "error",
+                    "message" => "permission denied"
+                ];
+            }
+        }else{
+            $results = [
+                "status" => "error",
+                "message" => "validation failed"
+            ];
+        }
+        $this->view('json', $results);
+    }
+
     public function remove_charge_from_user(){
         $username = $_POST["username"];
         $targetUsername = $_POST["target_username"];
