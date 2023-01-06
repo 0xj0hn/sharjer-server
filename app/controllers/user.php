@@ -95,6 +95,16 @@ class User extends Controller{
         $years = $model->getYears();
         $this->view("json", $years);
     }
+
+    public function get_month(){
+        $model = $this->model('user');
+        $month = $model->getThisMonth();
+        $result = [
+            "status" => "success",
+            "month" => "$month"
+        ];
+        $this->view("json", $result);
+    }
 }
 
 
