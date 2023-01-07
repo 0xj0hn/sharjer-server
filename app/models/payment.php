@@ -89,6 +89,7 @@ class PaymentModel extends Model {
         }catch(Exception $e){
             $update = $this->updateChargeMonth($bluck, $vahed, $year, $month, $price);
         }
+        $this->addToPayHistory($userInfo, $year, $month, $price);
         $this->sumChargesUp($year, $bluck, $vahed);
         return true;
     }
@@ -187,9 +188,9 @@ class PaymentModel extends Model {
                 if (!$chargePaid){
                     $chargePrice = $this->getChargeOfDate($year, $month);
                     $payment = $this->payCharge($userInfo, $chargePrice, $year, $month);
+                    $this->addToPayHistory($userInfo, $year, $month, $chargePrice);
                     $sumChargesUp = $this->sumChargesUp($year, $bluck, $vahed);
                     array_push($monthsPaid, $month);
-                }else{
                 }
             }
         }
@@ -221,5 +222,34 @@ class PaymentModel extends Model {
         }
     }
 
+    public function addToPayHistory($userInfo, $year, $month, $price){
+        $sql = "INSERT INTO payment_history(full_name, message) VALUES (?, ?)";
+        $fullName = "{$userInfo->name} {$userInfo->family}";
+        $price = intval($price) / 10; //try to make price as Toman
+        $bluck = $userInfo->bluck;
+        $vahed = $userInfo->vahed;
+        $message = "$fullName بلوک {$bluck}، واحد {$vahed}، شارژ ماه $month سال $year را به مبلغ $price پرداخت کرد.";
+        $query = $this->query($sql, "ss", $fullName, $message);
+        return $query ? true : false;
+    }
+
+    public function getPayHistory(){
+        $sql = "SELECT * FROM payment_history ORDER BY id DESC";
+        $query = $this->mysql->query($sql);
+        $rows = [];
+        if ($query->num_rows > 0){
+            while($row = $query->fetch_assoc()){
+                $paidAt = $row["paid_at"];
+                $timezone = new DateTimeZone("UTC");
+                $dateTime = new DateTime($paidAt);
+                $dateTimeWithCorrectTimezone = $dateTime->setTimezone($timezone);
+                $row["paid_at"] = jdate("Y-m-d\nH:i:s", $dateTimeWithCorrectTimezone->getTimestamp(), '', 'UTC');
+                $rows[] = $row;
+            }
+            return $rows;
+        }else{
+            return false;
+        }
+    }
 }
 ?>
