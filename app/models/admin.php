@@ -180,6 +180,90 @@ class AdminModel extends Model{
         }
     }
 
+    public function changeMonthsPrices($year, $months){
+        $chargePricesContentDecoded = $this->getMonthsPrice();
+        $chargePricesFileName = "chargePricesInfo.json";
+        $chargePricesFile = fopen($chargePricesFileName, "w");
+        $i = 0;
+        foreach($months as $monthKey => $monthValue){
+            if ($monthKey == $i){ //check if our months is indexed or associated
+                foreach($monthValue as $month => $price){
+                    $chargePricesContentDecoded[$year][$month] = $price;
+                }
+            }else{
+                $chargePricesContentDecoded[$year][$monthKey] = $monthValue;
+            }
+            $i++;
+        }
+        $chargePricesContentEncoded = json_encode($chargePricesContentDecoded);
+        fwrite($chargePricesFile, $chargePricesContentEncoded);
+        fclose($chargePricesFile);
+        return $chargePricesContentDecoded;
+    }
+
+    public function getMonthsPrice(){
+        $chargePricesFileName = "chargePricesInfo.json";
+        $chargePricesFile = fopen($chargePricesFileName, "r");
+        $chargePricesContent = fread($chargePricesFile, filesize($chargePricesFileName));
+        $chargePricesContentDecoded = json_decode($chargePricesContent, true);
+        fclose($chargePricesFile);
+        return $chargePricesContentDecoded;
+    }
+
+    public function sortPrices($monthsPriceArray){
+        $pricesArr = [];
+        $sortMonthsList = [
+            "محرم",
+            "صفر",
+            "ربیع الاول",
+            "ربیع الثانی",
+            "جمادی الاول",
+            "جمادی الثانی",
+            "رجب",
+            "شعبان",
+            "رمضان",
+            "شوال",
+            "ذیقعده",
+            "ذیحجه"
+        ];
+        $yearList = [];
+        $retData = [];
+        $monthsAndPrices = [];
+        foreach($monthsPriceArray as $year => $monthAndPrice){
+            $sortedMonths = $this->sortByArray($sortMonthsList, array_keys($monthAndPrice));
+            foreach($sortedMonths as $i => $month){
+                $yearList[$year][$month] = $monthAndPrice[$month];
+            }
+        }
+        //foreach($)
+        return $yearList;
+    }
+
+    public function sortByArray($sortArrElements, $goingToBeSortedArr){
+        sort($goingToBeSortedArr);
+        $temp = [];
+        $visited = array_fill(0, count($goingToBeSortedArr), false);
+        for($i = 0; $i < count($sortArrElements); $i++){
+            $sortElement = $sortArrElements[$i];
+            $firstOcc = array_search($sortElement, $goingToBeSortedArr);
+            if($firstOcc === false){
+                continue;
+            }
+            for($j = $firstOcc; $j < count($goingToBeSortedArr); $j++){
+                if ($sortElement == $goingToBeSortedArr[$j]){
+                    $temp[] = $sortElement;
+                    $visited[$j] = true;
+                }
+            }
+        }
+        for($i = 0; $i < count($visited); $i++){
+            if ($visited[$i] === false){
+                $temp[] = $goingToBeSortedArr[$i];
+            }
+        }
+        return $temp;
+    }
+
 }
 
 
