@@ -1,6 +1,7 @@
 <?php 
 
 class AuthenticationModel extends Model{
+    //we store the POST data into data field
     protected $data;
     public function login($username, $password){
         $sql = "SELECT * FROM users WHERE `username` = ? AND `password` = ?";
