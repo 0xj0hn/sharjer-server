@@ -4,7 +4,10 @@
 class DB {
     protected $mysql;
     protected $dbinformation;
-    public function __construct(){ //WE HAVE TO CHANGE THIS SECTION LATER.
+    private $encryptionMethod = "AES-256-CBC";
+    private $encryptionKey = "mojtama-amoli-residentialcomplex"; //32 bytes
+    private $encryptionIV = "mojtama-amoliaaa"; //16 bytes
+    public function __construct(){
         $host = "localhost";
         $username = "root";
         $password = "Mhdmhdmhd82@#";
@@ -36,6 +39,28 @@ class DB {
         $query->bind_param($types, ...$values);
         $query->execute();
         return $query; //the query type is mysqli_stmt that's why i wrote it like this.
+    }
+
+    protected function encrypt($plainText){
+        $cipherText = openssl_encrypt(
+            $plainText,
+            $this->encryptionMethod,
+            $this->encryptionKey,
+            0,
+            $this->encryptionIV
+        );
+        return $cipherText;
+    }
+
+    protected function decrypt($cipherText){
+        $plainText = openssl_decrypt(
+            $cipherText,
+            $this->encryptionMethod,
+            $this->encryptionKey,
+            0,
+            $this->encryptionIV
+        );
+        return $plainText;
     }
 
 

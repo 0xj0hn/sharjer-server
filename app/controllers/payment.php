@@ -248,18 +248,25 @@ class Payment extends Controller {
         }
     }
 
-    public function xzxz(){
+    public function get_payment_history(){
         $model = $this->model("payment");
-        $res = $model->sumChargesUp(1444, 1, 13);
-        echo $res;
+        $paymentHistory = $model->getPayHistory();
+        $result = [];
+        if ($paymentHistory !== false){
+            $result = $paymentHistory;
+        }else{
+            $result = [
+                "status" => "error",
+                "message" => "nothing exists"
+            ];
+        }
+        $this->view("json", $result);
     }
 
-    public function c(){
-        $model = $this->model("payment");
-        $price = $model->getChargeOfDate(1444, "ربیع الاول");
-        echo $price;
+    public function test(){
+        $out = jdate('Y-m-d'); 
+        echo $out;
     }
-
 }
 
 ?>

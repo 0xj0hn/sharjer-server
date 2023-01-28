@@ -320,6 +320,35 @@ class AdminPanel extends Controller{
         $this->view("json", $ans);
     }
 
+    public function change_months_price(){
+        $model = $this->model("admin");
+        $validate = Validator::validateElements($_POST, [
+            "username",
+            "password",
+            "year",
+            "months"
+        ]);
+        $ans = [];
+        if ($validate){
+            $year = $_POST["year"];
+            $months = json_decode($_POST["months"], true);
+            $ans = $model->changeMonthsPrices($year, $months);
+        }else{
+            $ans = [
+                "status" => "error",
+                "message" => "validation failed"
+            ];
+        }
+        $this->view("json", $ans);
+    }
+
+    public function months_price(){
+        $model = $this->model("admin");
+        $result = $model->getMonthsPrice();
+        $sortedArr = $model->sortPrices($result);
+        $result = $sortedArr;
+        $this->view("json", $result);
+    }
 }
 
 
