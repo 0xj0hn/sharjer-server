@@ -3,6 +3,15 @@
 class AuthenticationModel extends Model{
     //we store the POST data into data field
     protected $data;
+    public function encryptValue($value){
+        $encryptedString = $this->encrypt($value);
+        return $encryptedString;
+    }
+
+    public function decryptValue($value){
+        $decryptedString = $this->decrypt($value);
+        return $decryptedString;
+    }
     public function login($username, $password){
         $sql = "SELECT * FROM users WHERE `username` = ? AND `password` = ?";
         $query = $this->query($sql, "ss", $username, $password);
@@ -15,8 +24,7 @@ class AuthenticationModel extends Model{
     }
 
     public function signUp($data){
-        $this->data = $data;
-        $isCheckRequiredElements = Validator::validateElements($this->data, [
+        $isCheckRequiredElements = Validator::validateElements($data, [
             'username',
             'password',
             'name',
@@ -31,12 +39,12 @@ class AuthenticationModel extends Model{
             'is_owner',
         ]);
         if ($isCheckRequiredElements != true) return false; 
-        $isValidatedNeededElements = $this->validatePhoneUserBluckVahed();
+        $isValidatedNeededElements = $this->validatePhoneUserBluckVahed($data);
         $checkEndDate = (isset($data['end_date']) && !empty($data['end_date']));
         $enddate = $checkEndDate ? $data['end_date'] : "";
         $userExists = $this->checkIfUserExists($data['username']);
         if ($isValidatedNeededElements && !$userExists){
-            $password = md5($data['password']);
+            $password = $data['password'];
             $sql = "INSERT INTO users (username, password, name, family, phone, phone2, bluck, vahed, startdate, enddate, is_owner, car_plate, family_members) VALUES 
 (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             $query = $this->query($sql,
@@ -64,12 +72,12 @@ class AuthenticationModel extends Model{
 
 
 
-    public function validatePhoneUserBluckVahed(){
-        $validateUsername = Validator::validateUsername($this->data["username"]); 
-        $validatePhone1 = Validator::validatePhone($this->data["phone"]); 
-        $validatePhone2 = Validator::validatePhone($this->data["phone2"]); 
-        $validateBluck = Validator::validateBluckOrVahed($this->data["bluck"]); 
-        $validateVahed = Validator::validateBluckOrVahed($this->data["vahed"]);
+    public function validatePhoneUserBluckVahed($data){
+        $validateUsername = Validator::validateUsername($data["username"]); 
+        $validatePhone1 = Validator::validatePhone($data["phone"]); 
+        $validatePhone2 = Validator::validatePhone($data["phone2"]); 
+        $validateBluck = Validator::validateBluckOrVahed($data["bluck"]); 
+        $validateVahed = Validator::validateBluckOrVahed($data["vahed"]);
         if ($validateUsername &&
             $validatePhone1 &&
             $validatePhone2 &&
