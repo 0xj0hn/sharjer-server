@@ -167,7 +167,7 @@ class AdminModel extends Model{
     }
 
     public function showInformationOfUsers(){
-        $sql = "SELECT * FROM users";
+        $sql = "SELECT * FROM users ORDER BY bluck ASC";
         $query = $this->mysql->query($sql);
         $rows = [];
         if ($query->num_rows > 0){
