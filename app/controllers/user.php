@@ -105,6 +105,37 @@ class User extends Controller{
         ];
         $this->view("json", $result);
     }
+
+    public function get_me(){
+        $model = $this->model("user");
+        $result = [];
+        $isValidated = Validator::validateElements($_POST, [
+            "username",
+            "password"
+        ]);
+        if ($isValidated){
+            $username = $_POST["username"];
+            $password = $_POST["password"];
+            $userInfo = $model->getUserInformation($username, $password);
+            if ($userInfo === 0){
+                $result = [
+                    "status" => "error",
+                    "message" => "user not found"
+                ];
+            }else{
+                $result = [
+                    "status" => "success",
+                    "data" => $userInfo
+                ];
+            }
+        }else{
+            $result = [
+                "status" => "error",
+                "message" => "validation failed"
+            ];
+        }
+        $this->view("json", $result);
+    }
 }
 
 
