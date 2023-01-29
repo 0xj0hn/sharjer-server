@@ -171,8 +171,8 @@ class AdminModel extends Model{
         $query = $this->mysql->query($sql);
         $rows = [];
         if ($query->num_rows > 0){
-            while($row = $query->fetch_assoc()){
-                array_push($rows, $row);
+            while($row = $query->fetch_object()){
+                $rows[] = $row;
             }
             return $rows;
         }else{
