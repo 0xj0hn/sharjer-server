@@ -34,11 +34,14 @@ class DB {
      * @param $values array() an array of values belongs to sql command.
      * @return return the response of query execution.
      */
-    public function query($sql, $types, ...$values){
+    public function query($sql, $types=null, ...$values){
         $query = $this->mysql->prepare($sql);
-        $query->bind_param($types, ...$values);
+        //bind parameters only when $types is not null.
+        if ($types != null){
+            $query->bind_param($types, ...$values ?? null);
+        }
         $query->execute();
-        return $query; //the query type is mysqli_stmt that's why i wrote it like this.
+        return $query;
     }
 
     protected function encrypt($plainText){
