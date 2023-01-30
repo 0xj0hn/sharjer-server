@@ -26,6 +26,7 @@ class UserModel extends Model{
     public function getMojtamaRules(){
         $sql = "SELECT * FROM mojtama_rules";
         $query = $this->query($sql);
+        $query = $query->get_result();
         $resultArray = [];
         if ($query->num_rows > 0){
             while($row = $query->fetch_assoc()){
