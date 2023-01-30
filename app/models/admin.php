@@ -2,8 +2,9 @@
 class AdminModel extends Model{
     public function checkFullAdmin($username, $password){
         $sql = "SELECT * FROM users WHERE username = ? AND password = ?";
-        $res = $this->query($sql, "ss", $username, $password)->get_result();
-        if ($res->num_rows > 0){
+        $result = $this->query($sql, "ss", $username, $password);
+        $result = $result->get_result();
+        if ($result->num_rows > 0){
             while ($row = $res->fetch_assoc()){
                 if ($row["is_admin"] == "full"){
                     return true;
@@ -43,7 +44,8 @@ class AdminModel extends Model{
 
     public function getBluckMembers($adminuser, $bluck){
         $sql = "SELECT * FROM users WHERE `bluck`=$bluck ORDER BY `vahed`";
-        $query = $this->mysql->query($sql);
+        $query = $this->query($sql);
+        $query = $query->get_result();
         $arr = array();
         if ($query->num_rows > 0){
             while ($row = $query->fetch_assoc()){
@@ -100,7 +102,8 @@ class AdminModel extends Model{
         $bluck = $userInformation["bluck"];
         $vahed = $userInformation["vahed"];
         $sql = "SELECT * FROM bluck$bluck" . "_$year" . " WHERE  `واحد` = $vahed";
-        $query = $this->mysql->query($sql);
+        $query = $this->query($sql);
+        $query = $query->get_result();
         if ($query->num_rows > 0){
             while($row = $query->fetch_assoc()){
                 $arrayKeys = array_keys($row);
@@ -133,7 +136,8 @@ class AdminModel extends Model{
 
     public function checkIfRuleHasAdded(){
         $sql = "SELECT * FROM mojtama_rules";
-        $query = $this->mysql->query($sql);
+        $query = $this->query($sql);
+        $query = $query->get_result();
         if ($query->num_rows > 0){
             return OK;
         }else{
@@ -168,7 +172,8 @@ class AdminModel extends Model{
 
     public function showInformationOfUsers(){
         $sql = "SELECT * FROM users ORDER BY bluck ASC";
-        $query = $this->mysql->query($sql);
+        $query = $this->query($sql);
+        $query = $query->get_result();
         $rows = [];
         if ($query->num_rows > 0){
             while($row = $query->fetch_object()){

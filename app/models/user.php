@@ -15,6 +15,7 @@ class UserModel extends Model{
         }
         return (object)$retValue;
     }
+
     public function getFinancialStatus(){
         $fileName = "financial_status.json";
         $file = fopen($fileName, "r");
@@ -24,11 +25,11 @@ class UserModel extends Model{
     
     public function getMojtamaRules(){
         $sql = "SELECT * FROM mojtama_rules";
-        $query = $this->mysql->query($sql);
+        $query = $this->query($sql);
         $resultArray = [];
         if ($query->num_rows > 0){
             while($row = $query->fetch_assoc()){
-                array_push($resultArray, $row);
+                $resultArray[] = $row;
             }
         }else{
             return false;
@@ -48,7 +49,6 @@ class UserModel extends Model{
             //we want to get people splitted(by bluck or may whole of blucks)
             $bluckCharges += $getPeopleWhoChargedInThisBluck;
             $peopleWhoCharged += $getPeopleWhoChargedInThisBluck;
-
             array_push($bluckMembersCharges, $bluckCharges);
         }
         return [
@@ -61,7 +61,8 @@ class UserModel extends Model{
 
     public function getPeopleWhoChargedInBluck($bluckNumber, $year, $month){
         $sql = "SELECT COUNT(*) FROM bluck$bluckNumber" . "_$year WHERE NOT `$month` = '0'";
-        $query = $this->mysql->query($sql);
+        $query = $this->query($sql);
+        $query = $query->get_result();
         $sumOfPeople = 0;
         while($row = $query->fetch_array()){
             $sumOfPeople += $row[0];
@@ -83,7 +84,8 @@ class UserModel extends Model{
 
     public function getThisMonth(){
         $sql = "SELECT month FROM charge";
-        $query = $this->mysql->query($sql);
+        $query = $this->query($sql);
+        $query = $query->get_result();
         if ($query->num_rows > 0){
             while($row = $query->fetch_array()){
                 return $row[0];
@@ -97,7 +99,8 @@ class UserModel extends Model{
         $years = [];
         $dbname = $this->dbinformation->dbname;
         $sql = "SELECT * FROM information_schema.TABLES WHERE TABLE_SCHEMA='$dbname'";
-        $query = $this->mysql->query($sql);
+        $query = $this->query($sql);
+        $query = $query->get_result();
         if ($query->num_rows > 0){
             while($row = $query->fetch_assoc()){
                 if (str_contains($row["TABLE_NAME"], "bluck")){
@@ -116,7 +119,8 @@ class UserModel extends Model{
 
     public function getApplicationVersion(){
         $sql = "SELECT * FROM app_version";
-        $query = $this->mysql->query($sql);
+        $query = $this->query($sql);
+        $query = $query->get_result();
         if ($query->num_rows > 0){
             while($row = $query->fetch_assoc()){
                 return $row;
