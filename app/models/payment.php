@@ -57,7 +57,8 @@ class PaymentModel extends Model {
 
     public function isChargePaid($year, $month, $bluck, $vahed){
         $sql = "SELECT * FROM bluck$bluck" . "_$year " . "WHERE `واحد` = $vahed";
-        $query = $this->mysql->query($sql);
+        $query = $this->query($sql);
+        $query = $query->get_result();
         if ($query->num_rows > 0){
             while ($row = $query->fetch_assoc()){
                 if ($row[$month] != "0"){
@@ -70,7 +71,8 @@ class PaymentModel extends Model {
 
     public function getCurrentPrice(){
         $sql = "SELECT price FROM charge";
-        $query = $this->mysql->query($sql);
+        $query = $this->query($sql);
+        $query = $query->get_result();
         if ($query->num_rows > 0){
             while($row = $query->fetch_array()){
                 return $row[0];
@@ -96,7 +98,7 @@ class PaymentModel extends Model {
 
     public function prepareRowForCharge($bluck, $vahed, $year){
         $sql = "INSERT INTO `bluck$bluck"."_$year` (`واحد`, `محرم`, `صفر`, `ربیع الاول`, `ربیع الثانی`, `جمادی الاول`, `جمادی الثانی`, `رجب`, `شعبان`, `رمضان`, `شوال`, `ذیقعده`, `ذیحجه`, `جمع`) VALUES ('$vahed', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0')";
-        $query = $this->mysql->query($sql);
+        $query = $this->query($sql);
         return $query;
     }
 
@@ -235,7 +237,8 @@ class PaymentModel extends Model {
 
     public function getPayHistory(){
         $sql = "SELECT * FROM payment_history ORDER BY id DESC";
-        $query = $this->mysql->query($sql);
+        $query = $this->query($sql);
+        $query = $query->get_result();
         $rows = [];
         if ($query->num_rows > 0){
             while($row = $query->fetch_assoc()){

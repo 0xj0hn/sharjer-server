@@ -105,6 +105,71 @@ class User extends Controller{
         ];
         $this->view("json", $result);
     }
+
+    public function get_myself(){
+        $model = $this->model("user");
+        $result = [];
+        $isValidated = Validator::validateElements($_POST, [
+            "username",
+            "password"
+        ]);
+        if ($isValidated){
+            $username = $_POST["username"];
+            $password = $_POST["password"];
+            $userInfo = $model->getUserInformation($username, $password);
+            if ($userInfo === 0){
+                $result = [
+                    "status" => "error",
+                    "message" => "user not found"
+                ];
+            }else{
+                $result = [
+                    "status" => "success",
+                    "data" => $userInfo
+                ];
+            }
+        }else{
+            $result = [
+                "status" => "error",
+                "message" => "validation failed"
+            ];
+        }
+        $this->view("json", $result);
+    }
+
+    public function update_myself(){
+        $model = $this->model("user");
+        $fields = [
+            "username",
+            "password",
+            "name",
+            "family",
+            "phone",
+            "phone2",
+            "bluck",
+            "vahed",
+            "family_members",
+            "car_plate",
+            "startdate",
+            "enddate",
+            "is_owner"
+        ];
+        $validation = Validator::validateElements($_POST, $fields);
+        $result = [];
+        if ($validation){
+            $model->updateUserInformation($_POST);
+            $result = [
+                "status" => "success",
+                "message" => "user information has been updated"
+            ];
+        }else{
+            $result = [
+                "status" => "error",
+                "message" => "validation failed"
+            ];
+        }
+        $this->view("json", $result);
+    }
 }
 
 
