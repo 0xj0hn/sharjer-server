@@ -16,6 +16,38 @@ class UserModel extends Model{
         return (object)$retValue;
     }
 
+    public function updateUserInformation($postData){
+        $sql = "UPDATE users SET username = ?, name = ?,
+            family = ?,
+            phone = ?,
+            phone2 = ?,
+            bluck = ?,
+            vahed = ?,
+            family_members = ?,
+            car_plate = ?,
+            startdate = ?,
+            enddate = ?,
+            is_owner = ? WHERE username = ? AND password = ?";
+        $query = $this->query($sql,
+            "sssssiiisssiss",
+            $postData["new_username"],
+            $postData["name"],
+            $postData["family"],
+            $postData["phone"],
+            $postData["phone2"],
+            $postData["bluck"],
+            $postData["vahed"],
+            $postData["family_members"],
+            $postData["car_plate"],
+            $postData["startdate"],
+            $postData["enddate"],
+            $postData["is_owner"],
+            $postData["username"],
+            $postData["password"]
+        );
+        return $query;
+    }
+
     public function getFinancialStatus(){
         $fileName = "financial_status.json";
         $file = fopen($fileName, "r");

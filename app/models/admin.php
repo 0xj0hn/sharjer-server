@@ -144,7 +144,7 @@ class AdminModel extends Model{
             return DOES_NOT_EXIST;
         }
     }
-    
+
     public function editMojtamaRules($inputRuleFromAdmin){
         $currentTime = time();
         $sql = "UPDATE mojtama_rules SET rule = ?, edited_at = ?";
