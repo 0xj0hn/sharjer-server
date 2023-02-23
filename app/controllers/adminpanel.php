@@ -77,19 +77,42 @@ class AdminPanel extends Controller{
     public function change_privilege(...$params){
         $model = $this->model('admin');
         $result = [];
-        if ($params[0] && $params[1]){
-            $change = $model->changePrivilege($params[0], $params[1]);
-            if ($change == OK){
+        $validation = Validator::validateElements($_POST, [
+            "username",
+            "password"
+        ]);
+        $validation2 = Validator::validateElements($params, [0, 1]);
+        $validation = ($validation && $validation2);
+        if ($validation){
+            $username = $_POST["username"];
+            $password = $_POST["password"];
+            $targetUsername = $params[0];
+            $privilege = $params[1];
+            $checkFullAdmin = $model->checkFullAdmin($username, $password);
+            $change = $model->changePrivilege($targetUsername, $privilege);
+            if ($change == OK && $checkFullAdmin == true){
                 $result = [
-                    "status" => "success"
+                    "status" => "success",
+                    "message" => "privilege has been changed"
                 ];
-            }else {
+            } else if ($checkFullAdmin != true){
+                $result = [
+                    "code" => 401,
+                    "status" => "unathorized_user",
+                    "message" => "Permission denied"
+                ];
+            } else {
                 $result = [
                     "status" => "error"
                 ];
             }
-            $this->view("json", $result);
+        }else{
+            $result = [
+                "status" => "error",
+                "message" => "validation failed"
+            ];
         }
+        $this->view("json", $result);
     }
 
     public function add_charge_to_user(){
@@ -326,7 +349,7 @@ class AdminPanel extends Controller{
             "username",
             "password",
             "year",
-            "months"
+            "months" //month and price should be here.
         ]);
         $ans = [];
         if ($validate){
@@ -347,6 +370,36 @@ class AdminPanel extends Controller{
         $result = $model->getMonthsPrice();
         $sortedArr = $model->sortPrices($result);
         $result = $sortedArr;
+        $this->view("json", $result);
+    }
+
+    public function get_charge_status_of($targetUsername=null){
+        $result = [];
+        $model = $this->model("admin");
+        $userModel = $this->model("user");
+        $validation = Validator::validateElements($_POST, [
+            "username",
+            "password"
+        ]);
+        $validation = true; //TODO
+        if ($validation){
+            if ($targetUsername){
+                $userInfo = $model->getUserInformation($targetUsername);
+                if ($userInfo == null) return; //exit when user doesn't exist
+                $result = $userModel->getUserPayStat($userInfo->bluck, $userInfo->vahed);
+            }else{
+                $result = [
+                    "status" => "error",
+                    "message" => "you haven't provided username"
+                ];
+            }
+        }else {
+            $result = [
+                "code" => 401,
+                "status" => "error",
+                "message" => "authentication failed"
+            ];
+        }
         $this->view("json", $result);
     }
 }
