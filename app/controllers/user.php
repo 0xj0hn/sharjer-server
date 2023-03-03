@@ -54,9 +54,19 @@ class User extends Controller{
         $this->view("json", $result);
     }
 
-    public function app_version(){
+    public function app_version($givenAppVersion){
         $model = $this->model("user");
-        $res = $model->getApplicationVersion();
+        $res;
+        $latestVersionInfo = $model->getApplicationVersion();
+        if (isset($givenAppVersion) && !empty($givenAppVersion)){
+            if ($latestVersionInfo["version_number"] == $givenAppVersion){
+                $res = array_merge(["status" => "updated", "given_version" => $givenAppVersion], $latestVersionInfo);
+            }else{
+                $res = array_merge(["status" => "not updated", "given_version" => $givenAppVersion], $latestVersionInfo);
+            }
+        }else{
+            $res = $latestVersionInfo;
+        }
         $this->view("json", $res);
     }
 
