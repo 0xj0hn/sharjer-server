@@ -6,8 +6,8 @@ class NotificationModel extends Model {
         $parameters = [
             "registration_ids" => $devicesTokens,
             "notification" => [
-                "title" => "some title",
-                "body" => "some body"
+                "title" => $title,
+                "body" => $body
             ],
         ];
         curl_setopt_array($curl, [
@@ -59,7 +59,7 @@ class NotificationModel extends Model {
 
     public function updateFirebaseToken($username, $givenToken){
         $sql = "UPDATE users SET firebase_token = ? WHERE username = ?";
-        $query = $this->query($givenToken, $username);
+        $query = $this->query($sql, "ss", $givenToken, $username);
         return $query;
     }
 }

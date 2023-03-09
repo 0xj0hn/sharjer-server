@@ -4,6 +4,7 @@ class AdminPanel extends Controller{
 
     public function update_month(...$params){
         $model = $this->model('admin');
+        $notifModel = $this->model('notification');
         $month = $params[0];
         $validateParams = Validator::validateElements($_POST, [
             'username',
@@ -16,6 +17,7 @@ class AdminPanel extends Controller{
                 $isAdmin = $model->checkFullAdmin($username, $password);
                 if ($isAdmin){
                     $update = $model->updateMonth($month);
+                    $sendNotif = $notifModel->sendNotifToAllMembersOnChargeTime();
                     $result = [
                         "status" => "success",
                         "message" => "month was updated"
