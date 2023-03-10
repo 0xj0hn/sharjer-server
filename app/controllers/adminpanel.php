@@ -404,6 +404,50 @@ class AdminPanel extends Controller{
         }
         $this->view("json", $result);
     }
+
+    public function send_notif($title){
+        $model = $this->model("admin");
+        $notifModel = $this->model("notification");
+        $validation = Validator::validateElements($_POST, [
+            "username",
+            "password",
+            "body"
+        ]);
+        $result = [];
+        if ($validation){
+            $username = $_POST["username"];
+            $password = $_POST["password"];
+            $body = $_POST["body"];
+            $adminCheck = $model->checkFullAdmin($username, $password);
+            if ($adminCheck){
+                $notifModel = $notifModel->sendNotifToAllMembers($title, $body);
+                if ($notifModel) {
+                    $result = [
+                        "status" => "success",
+                        "message" => "message sent to all members"
+                    ];
+                }else{
+                    $result = [
+                        "status" => "error",
+                        "message" => "request had problems"
+                    ];
+                }
+            }else{
+                $result = [
+                    "code" => 401,
+                    "status" => "error",
+                    "message" => "permission denied"
+                ];
+            }
+        }else{
+            $result = [
+                "code" => 400,
+                "status" => "error",
+                "message" => "validation failed"
+            ];
+        }
+        $this->view("json", $result);
+    }
 }
 
 
