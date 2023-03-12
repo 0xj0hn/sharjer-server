@@ -92,6 +92,9 @@ class PaymentModel extends Model {
             $update = $this->updateChargeMonth($bluck, $vahed, $year, $month, $price);
         }
         $this->addToPayHistory($userInfo, $year, $month, $price);
+        require_once "app/models/notification.php";
+        $model = new NotificationModel;
+        $model->sendNotifToAllAdmins($fullName, $year, $month, $price);
         $this->sumChargesUp($year, $bluck, $vahed);
         return true;
     }
