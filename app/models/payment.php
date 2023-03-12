@@ -81,10 +81,11 @@ class PaymentModel extends Model {
         return false;
     }
 
-    public function payCharge($userInfo, $price=null, $year, $month){
+    public function payCharge($userInfo, $price=null, $year, $month){ //TODO: if i can, i would change these payment functions to class.
+        $fullName = "{$userInfo->name} {$userInfo->family}";
         $bluck = $userInfo->bluck;
         $vahed = $userInfo->vahed;
-        $sql = "UPDATE bluck$bluck"."_$year SET `$month` = '$price' WHERE `واحد` = '$vahed'";
+        $this->createTableIfnotExists($bluck, $vahed, $year);
         try{
             $prepare = $this->prepareRowForCharge($bluck, $vahed, $year);
             $update = $this->updateChargeMonth($bluck, $vahed, $year, $month, $price);
