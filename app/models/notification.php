@@ -1,5 +1,4 @@
 <?php
-require_once "vendor/autoload.php";
 class NotificationModel extends Model {
     public function sendNotif($title='title', $body='body', $devicesTokens, $navigation=null){
         $curl = curl_init();
