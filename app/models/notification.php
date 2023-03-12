@@ -1,15 +1,22 @@
 <?php
 require_once "vendor/autoload.php";
 class NotificationModel extends Model {
-    public function sendNotif($title='title', $body='body', $devicesTokens){
+    public function sendNotif($title='title', $body='body', $devicesTokens, $navigation=null){
         $curl = curl_init();
         $parameters = [
             "registration_ids" => $devicesTokens,
             "notification" => [
                 "title" => $title,
-                "body" => $body
+                "body" => $body,
             ],
         ];
+        if ($navigation != null){
+            $parameters["data"] = [
+                "navigation" => $navigation
+            ];
+        }
+        $firebaseTokenFileName = "firebase_token";
+        $firebaseApiKey = file_get_contents($firebaseTokenFileName);
         curl_setopt_array($curl, [
             CURLOPT_URL => "https://fcm.googleapis.com/fcm/send",
             CURLOPT_RETURNTRANSFER => true,
@@ -17,7 +24,7 @@ class NotificationModel extends Model {
             CURLOPT_CUSTOMREQUEST => "POST",
             CURLOPT_HTTPHEADER => [
                 "Content-Type: application/json",
-                "Authorization: key=AAAATYXhtFo:APA91bEoQuu4P6FO0Nd9qaQ_LzbZv9NLrhfp9QFNfX30kT6PugCuMhUw0wPSLFOu4W7netdx6rCy5FYP75AZ-EpUZQ3PA4oQwy-MGyH_p-Y_OX8QlwE_aeGw8Q_omlilYEPcXCWNFEsF"
+                "Authorization: key=$firebaseApiKey"
             ],
             CURLOPT_POSTFIELDS => json_encode($parameters)
         ]
@@ -28,12 +35,20 @@ class NotificationModel extends Model {
             echo $err;
             return false;
         }else{
-            echo $response;
             return $response;
         }
     }
 
-    public function sendNotifToAllMembersOnChargeTime(){ //this function should be checked.
+    public function sendNotifToAllMembers($title, $body){ //this function is not in use yet.
+        $usersFirebaseTokens = $this->getAllUsersTokens();
+        if ($usersFirebaseTokens){
+            $sendNotifs = $this->sendNotif($title, $body, $usersFirebaseTokens);
+            return $sendNotifs;
+        }
+        return false;
+    }
+
+    public function getAllUsersTokens(){
         $sql = "SELECT * FROM users";
         $query = $this->query($sql);
         $result = $query->get_result();
@@ -51,10 +66,40 @@ class NotificationModel extends Model {
         if (count($usersFirebaseTokens) == 0){
             return false;
         }
-        $title = "پرداخت شارژ";
-        $body = "نکنه شارژ رو یادت بره این ماه!\nسریع پرداخت کن!";
-        $sendNotifs = $this->sendNotif($title, $body, $usersFirebaseTokens);
-        return $sendNotifs;
+        return $usersFirebaseTokens;
+    }
+
+    public function sendNotifToAllAdmins($chargePayerFullName, $year, $month, $price){
+        $title = "واریزی";
+        $body = "شارژ ماه $month برای سال $year همین الان توسط $chargePayerFullName پرداخت شد!!";
+        $adminDevicesTokens = $this->getAdminsTokens();
+        if ($adminDevicesTokens){
+            $navigationPage = "/history_screen";
+            $sendNotifs = $this->sendNotif($title, $body, $adminDevicesTokens, $navigationPage);
+            return $sendNotifs;
+        }
+        return false;
+    }
+
+    public function getAdminsTokens(){
+        $sql = "SELECT * FROM users WHERE is_admin <> ?";
+        $query = $this->query($sql, "s", "no");
+        $result = $query->get_result();
+        $adminDevicesTokens = [];
+        if ($result->num_rows > 0){
+            while($row = $result->fetch_assoc()){
+                $adminDeviceToken = $row["firebase_token"];
+                if (!empty($adminDeviceToken)){
+                    $adminDevicesTokens[] = $adminDeviceToken;
+                }
+            }
+        }else{
+            return false;
+        }
+        if (count($adminDevicesTokens) == 0){
+            return false;
+        }
+        return $adminDevicesTokens;
     }
 
     public function updateFirebaseToken($username, $givenToken){
