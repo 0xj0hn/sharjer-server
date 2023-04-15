@@ -31,7 +31,7 @@ class Payment extends Controller {
             $vahed = $userInformation->vahed;
             $phoneNumber = $userInformation->phone;
             $sessionId = session_id();
-            $callbackUrl = "http://localhost/mojtama-server-mvc/payment/callback/?sessionId=$sessionId";
+            $callbackUrl = "http://192.168.42.62/mojtama-server-mvc/payment/callback/?sessionId=$sessionId";
             $_SESSION["username"] = $username;
             $_SESSION["password"] = $password;
             $_SESSION["year"] = $currentYear;
@@ -108,7 +108,7 @@ class Payment extends Controller {
             $_SESSION["user_info"] = $userInfo;
             $_SESSION["price"] = $price;
             $_SESSION["jsonEnteredByUser"] = $json;
-            $callbackUrl = "http://localhost/mojtama-server-mvc/payment/custom_callback/?username={$userInfo->username}&sessionId={$sessionId}";
+            $callbackUrl = "http://192.168.42.62/mojtama-server-mvc/payment/custom_callback/?username={$userInfo->username}&sessionId={$sessionId}";
             $parameters = array(
                 "merchant"=> ZIBAL_MERCHANT_KEY,//required
                 "callbackUrl" => $callbackUrl,

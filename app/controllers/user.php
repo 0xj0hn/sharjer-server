@@ -54,9 +54,19 @@ class User extends Controller{
         $this->view("json", $result);
     }
 
-    public function app_version(){
+    public function app_version($givenAppVersion){
         $model = $this->model("user");
-        $res = $model->getApplicationVersion();
+        $res;
+        $latestVersionInfo = $model->getApplicationVersion();
+        if (isset($givenAppVersion) && !empty($givenAppVersion)){
+            if ($latestVersionInfo["version_number"] == $givenAppVersion){
+                $res = array_merge(["status" => "updated", "given_version" => $givenAppVersion], $latestVersionInfo);
+            }else{
+                $res = array_merge(["status" => "not updated", "given_version" => $givenAppVersion], $latestVersionInfo);
+            }
+        }else{
+            $res = $latestVersionInfo;
+        }
         $this->view("json", $res);
     }
 
@@ -169,6 +179,48 @@ class User extends Controller{
             ];
         }
         $this->view("json", $result);
+    }
+
+    public function update_firebase_token(){
+        $model = $this->model("notification");
+        $userModel = $this->model("user");
+        $validation = Validator::validateElements($_POST, [
+            "username",
+            "password",
+            "new_token"
+        ]);
+        $response = [];
+        if ($validation){
+            $username = $_POST["username"];
+            $password = $_POST["password"];
+            $newToken = $_POST["new_token"];
+            $userInfo = $userModel->getUserInformation($username, $password);
+            if ($userInfo === 0){
+                $response = [
+                    "status" => "error",
+                    "message" => "user doesn't exist"
+                ];
+            }else{
+                $updated = $model->updateFirebaseToken($username, $newToken);
+                if ($updated){
+                    $response = [
+                        "status" => "success",
+                        "message" => "device token has been updated"
+                    ];
+                }else{
+                    $response = [
+                        "status" => "error",
+                        "message" => "due to a problem i couldn't update the token"
+                    ];
+                }
+            }
+        }else{
+            $response = [
+                "status" => "error",
+                "message" => "validation failed"
+            ];
+        }
+        $this->view("json", $response);
     }
 }
 

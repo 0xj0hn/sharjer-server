@@ -5,7 +5,7 @@ class AdminModel extends Model{
         $result = $this->query($sql, "ss", $username, $password);
         $result = $result->get_result();
         if ($result->num_rows > 0){
-            while ($row = $res->fetch_assoc()){
+            while ($row = $result->fetch_assoc()){
                 if ($row["is_admin"] == "full"){
                     return true;
                 }else{
@@ -23,21 +23,26 @@ class AdminModel extends Model{
     }
 
     public function updatePrice($price){
+        require_once "app/models/user.php";
         $price = $price . "0";
         $sql = "UPDATE charge SET price = ?";
         $query = $this->query($sql, "s", $price);
+        $userModel = new UserModel;
+        $currentYear = $userModel->getThisYear();
+        $currentMonth = $userModel->getThisMonth();
+        $this->changeMonthsPrices($currentYear, [$currentMonth => intval($price)]);
         return $query ? true : false;
     }
 
     public function changePrivilege($target, $privilege){
         $sql = "";
-        $types = "";
         if ($privilege == "delete"){
             $sql = "DELETE FROM users WHERE username = '$target'";
             return $this->query($sql, "s", $target);
         }else{
             $sql = "UPDATE `users` SET `is_admin` = ? WHERE `users`.`username` = ?";
-            return $this->query($sql, "ss", $privilege, $target);
+            $query = $this->query($sql, "ss", $privilege, $target);
+            return $query ? true : false;
         }
         return ERROR;
     }
@@ -269,6 +274,14 @@ class AdminModel extends Model{
         return $temp;
     }
 
+    public function getUserInformation($username){
+        $sql = "SELECT * FROM users WHERE username = ?";
+        $query = $this->query($sql, "s", $username);
+        $query = $query->get_result();
+        while ($row = $query->fetch_object()){
+            return $row;
+        }
+    }
 }
 
 
