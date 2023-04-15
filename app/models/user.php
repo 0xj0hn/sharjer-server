@@ -146,7 +146,7 @@ class UserModel extends Model{
         $query = $query->get_result();
         if ($query->num_rows > 0){
             while($row = $query->fetch_assoc()){
-                if (str_contains($row["TABLE_NAME"], "bluck")){
+                if (strpos($row["TABLE_NAME"], "bluck")){
                     $table = $row["TABLE_NAME"];
                     $year = preg_replace("/bluck[0-9]_/", "", $table);
                     array_push($years, $year);
