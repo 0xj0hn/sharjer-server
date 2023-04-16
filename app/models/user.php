@@ -141,16 +141,14 @@ class UserModel extends Model{
     public function getYears(){
         $years = [];
         $dbname = $this->dbinformation->dbname;
-        $sql = "SELECT * FROM information_schema.TABLES WHERE TABLE_SCHEMA='$dbname'";
+        $sql = "SELECT * FROM information_schema.TABLES WHERE TABLE_SCHEMA='$dbname' AND TABLE_NAME LIKE 'bluck%'";
         $query = $this->query($sql);
         $query = $query->get_result();
         if ($query->num_rows > 0){
             while($row = $query->fetch_assoc()){
-                if (strpos($row["TABLE_NAME"], "bluck")){
-                    $table = $row["TABLE_NAME"];
-                    $year = preg_replace("/bluck[0-9]_/", "", $table);
-                    array_push($years, $year);
-                }
+                $table = $row["TABLE_NAME"];
+                $year = preg_replace("/bluck[0-9]_/", "", $table);
+                array_push($years, $year);
             }
         }else{
             return false;
