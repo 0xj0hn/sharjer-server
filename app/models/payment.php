@@ -85,7 +85,7 @@ class PaymentModel extends Model {
         $fullName = "{$userInfo->name} {$userInfo->family}";
         $bluck = $userInfo->bluck;
         $vahed = $userInfo->vahed;
-        $this->createTableIfnotExists($bluck, $vahed, $year);
+        $this->createTableIfNotExists($bluck, $vahed, $year);
         try{
             $prepare = $this->prepareRowForCharge($bluck, $vahed, $year);
             $update = $this->updateChargeMonth($bluck, $vahed, $year, $month, $price);
@@ -98,6 +98,27 @@ class PaymentModel extends Model {
         $model->sendNotifToAllAdmins($fullName, $year, $month, $price);
         $this->sumChargesUp($year, $bluck, $vahed);
         return true;
+    }
+
+    public function createTableIfNotExists($bluck, $vahed, $year) {
+        $sql = "CREATE TABLE IF NOT EXISTS bluck".$bluck."_$year (
+            `واحد` int(2),
+            `محرم` int(11),
+            `صفر` int(11),
+            `ربیع الاول` int(11),
+            `ربیع الثانی` int(11),
+            `جمادی الاول` int(11),
+            `جمادی الثانی` int(11),
+            `رجب` int(11),
+            `شعبان` int(11),
+            `رمضان` int(11),
+            `شوال` int(11),
+            `ذیقعده` int(11),
+            `ذیحجه` int(11),
+            `جمع` int(11)
+        )";
+        $query = $this->query($sql);
+        return $query ? true : false;
     }
 
     public function prepareRowForCharge($bluck, $vahed, $year){
