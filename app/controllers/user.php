@@ -56,7 +56,7 @@ class User extends Controller{
 
     public function app_version($givenAppVersion){
         $model = $this->model("user");
-        $res;
+        $res = [];
         $latestVersionInfo = $model->getApplicationVersion();
         if (isset($givenAppVersion) && !empty($givenAppVersion)){
             if ($latestVersionInfo["version_number"] == $givenAppVersion){
@@ -221,6 +221,39 @@ class User extends Controller{
             ];
         }
         $this->view("json", $response);
+    }
+
+    public function change_password(){
+        $result = [];
+        $validate = Validator::validateElements($_POST, [
+            "username",
+            "password",
+            "new_password"
+        ]);
+        if ($validate){
+            $model = $this->model("user");
+            $username = $_POST["username"];
+            $password = $_POST["password"];
+            $newPassword = $_POST["new_password"];
+            $isUpdated = $model->changePassword($username, $password, $newPassword);
+            if ($isUpdated) {
+                $result = [
+                    "status" => "success",
+                    "message" => "password has been changed"
+                ];
+            }else{
+                $result = [
+                    "status" => "error",
+                    "message" => "error has been occured while updating the password"
+                ];
+            }
+        } else {
+            $result = [
+                "status" => "error",
+                "message" => "validation failed"
+            ];
+        }
+        $this->view("json", $result);
     }
 }
 
