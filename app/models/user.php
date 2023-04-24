@@ -48,6 +48,12 @@ class UserModel extends Model{
         return $query;
     }
 
+    public function changePassword($username, $password, $newPassword){
+        $encryptedPassword = $this->encrypt($newPassword);
+        $sql = "UPDATE users SET `password` = ? WHERE username = ? AND password = ?";
+        $query = $this->query($sql, "sss", $encryptedPassword, $username, $newPassword);
+        return $query ? true : false;
+    }
     public function getFinancialStatus(){
         $fileName = "financial_status.json";
         $file = fopen($fileName, "r");
