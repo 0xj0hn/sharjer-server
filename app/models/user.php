@@ -51,7 +51,7 @@ class UserModel extends Model{
     public function changePassword($username, $password, $newPassword){
         $encryptedPassword = $this->encrypt($newPassword);
         $sql = "UPDATE users SET `password` = ? WHERE username = ? AND password = ?";
-        $query = $this->query($sql, "sss", $encryptedPassword, $username, $newPassword);
+        $query = $this->query($sql, "sss", $encryptedPassword, $username, $password);
         return $query ? true : false;
     }
     public function getFinancialStatus(){
@@ -183,7 +183,7 @@ class UserModel extends Model{
         foreach($years as $year){
             $sql = "SELECT * FROM bluck$bluck"."_$year WHERE `واحد` = ?";
             $query = $this->query($sql, "i", $vahed);
-            $result = $query->get_result();
+			$result = $query->get_result();
             while($row = $result->fetch_assoc()){
                 $yearWrapperArr = array($year => $row);
                 $results[] = $yearWrapperArr;
