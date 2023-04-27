@@ -1,6 +1,7 @@
 <?php
 class NotificationModel extends Model {
     public function sendNotif($title='title', $body='body', $devicesTokens, $navigation=null){
+        $devicesTokens = array_unique($devicesTokens);
         $curl = curl_init();
         $parameters = [
             "registration_ids" => $devicesTokens,
