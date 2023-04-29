@@ -11,3 +11,20 @@
 .error-title {
     color: red;
 }
+
+input {
+    padding: 8px;
+    border-radius: 10px;
+    border: grey solid 1px;
+    margin: 8px;
+}
+
+input#button {
+    background-color: green;
+    color: white;
+    opacity: 0.6;
+    transition: 0.3s;
+}
+input#button:hover {
+    opacity: 1;
+}

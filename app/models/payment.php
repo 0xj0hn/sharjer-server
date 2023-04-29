@@ -100,7 +100,7 @@ class PaymentModel extends Model {
         return true;
     }
 
-    public function createTableIfNotExists($bluck, $vahed, $year) {
+    public function createTableIfNotExists($bluck, $year) {
         $sql = "CREATE TABLE IF NOT EXISTS bluck".$bluck."_$year (
             `واحد` int(2),
             `محرم` int(11),
