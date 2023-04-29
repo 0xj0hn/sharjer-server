@@ -1,4 +1,5 @@
 <?php 
+include "./app/core/bootstrap.php";
 include "./app/core/jdf/jdf.php";
 include "./app/core/App.php";
 include "./app/core/Validator.php";

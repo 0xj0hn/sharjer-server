@@ -448,6 +448,42 @@ class AdminPanel extends Controller{
         }
         $this->view("json", $result);
     }
+
+    public function csv_uploader(){
+        $this->view("csv_uploader");
+    }
+
+    public function csv_uploader_response(){
+        $model = $this->model("admin");
+        $validate = Validator::validateElements($_POST, [
+            "username",
+            "password",
+        ]);
+        $validate = ($validate && Validator::validateElements($_FILES, [
+            "csv_file"
+        ]));
+        if ($validate){
+            $username = $_POST["username"];
+            $password = $_POST["password"];
+            $encryptedPassword = $model->getEncryptedPassword($password);
+            $checkFullAdmin = $model->checkFullAdmin($username, $encryptedPassword);
+            if ($checkFullAdmin){
+                $csvFileInfo = $_FILES["csv_file"];
+                $csvFileName = $csvFileInfo["name"];
+                move_uploaded_file($csvFileInfo["tmp_name"], basename($csvFileName));
+                $isPushed = $model->pushCsvDataToDatabase($csvFileName);
+                if ($isPushed){
+                    $this->view("payment_success", "شارژ‌ها به پایگاه داده اضافه شدند.");
+                }
+                unlink($csvFileInfo["name"]);
+            }else{
+                $this->view("payment_error", "شکست", "شما دسترسی این کار را ندارید.");
+            }
+        }else{
+            $this->view("payment_error", "شکست", "بعضی مقادیر از سمت شما ارسال نشدند. لطفا دوباره امتحان کنید.");
+        }
+
+    }
 }
 
 
