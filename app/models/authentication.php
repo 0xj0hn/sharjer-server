@@ -13,6 +13,7 @@ class AuthenticationModel extends Model{
         return $decryptedString;
     }
     public function login($username, $password){
+        $username = trim($username);
         $sql = "SELECT * FROM users WHERE `username` = ? AND `password` = ?";
         $query = $this->query($sql, "ss", $username, $password);
         $result = $query->get_result();
