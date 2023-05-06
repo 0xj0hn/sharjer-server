@@ -279,5 +279,44 @@ class PaymentModel extends Model {
             return false;
         }
     }
+
+    public function getWhoDidntPayThisMonth($year, $month){
+        $blucks = $this->dbinformation->blucks;
+        $users = [];
+        foreach($blucks as $bluck){
+            $users[$bluck] = $this->getWhoDidntPayInBluck($bluck, $year, $month);
+        }
+        return $users;
+    }
+
+    public function getWhoDidntPayInBluck($bluck, $year, $month){
+        $sql = "SELECT * FROM bluck{$bluck}_{$year} WHERE `$month` = 0";
+        $query = $this->query($sql);
+        $result = $query->get_result();
+        $users = [];
+        if ($result->num_rows > 0){
+            while ($row = $result->fetch_assoc()){
+                $vahed = $row["واحد"];
+                $name = $this->getNameOfTheUser($bluck, $vahed);
+                if ($name !== false){
+                    $users[] = $name;
+                }
+            }
+            return $users;
+        }
+        return false;
+    }
+
+    public function getNameOfTheUser($bluck, $vahed){
+        $sql = "SELECT * FROM users WHERE bluck = ? AND vahed = ?";
+        $query = $this->query($sql, "ii", $bluck, $vahed);
+        $result = $query->get_result();
+        if ($result->num_rows > 0){
+            while ($row = $result->fetch_assoc()){
+                return "{$row["name"]} {$row["family"]}";
+            }
+        }
+        return false;
+    }
 }
 ?>
