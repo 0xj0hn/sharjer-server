@@ -263,6 +263,24 @@ class Payment extends Controller {
         $this->view("json", $result);
     }
 
+    public function get_who_didnt_pay_this_month(){
+        $model = $this->model("payment");
+        $userModel = $this->model("user");
+        $year = $userModel->getThisYear();
+        $month = $userModel->getThisMonth();
+        $users = $model->getWhoDidntPayThisMonth($year, $month);
+        $result = [];
+        if ($users !== false){
+            $result = $users;
+        }else{
+            $result = [
+                "status" => "error",
+                "message" => "there's a problem"
+            ];
+        }
+        $this->view("json", $result);
+    }
+
     public function test(){
         $out = jdate('Y-m-d'); 
         echo $out;

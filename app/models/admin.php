@@ -16,6 +16,10 @@ class AdminModel extends Model{
         return false;
     }
 
+    public function getEncryptedPassword($plainPassword){
+        return $this->encrypt($plainPassword);
+    }
+
     public function updateMonth($month){
         $sql = "UPDATE charge SET month = ?";
         $res = $this->query($sql, "s", $month);
@@ -176,7 +180,7 @@ class AdminModel extends Model{
     }
 
     public function showInformationOfUsers(){
-        $sql = "SELECT * FROM users ORDER BY bluck ASC";
+        $sql = "SELECT * FROM users ORDER BY bluck, vahed ASC";
         $query = $this->query($sql);
         $query = $query->get_result();
         $rows = [];
@@ -281,6 +285,58 @@ class AdminModel extends Model{
         while ($row = $query->fetch_object()){
             return $row;
         }
+    }
+
+    public function pushCsvDataToDatabase($csvFileName){
+        $csvFilePointer = fopen($csvFileName, "r");
+        $separatedFilename = explode("_", pathinfo($csvFileName, PATHINFO_FILENAME));
+        $bluck = $separatedFilename[0];
+        $year = $separatedFilename[1];
+        $isPrepared = $this->createTableIfNotExist($bluck, $year);
+        $isInserted = false;
+        if ($isPrepared) {
+            $givenVahed = 1; //the line number is the user's vahed
+            while(!feof($csvFilePointer)) {
+                $row = fgetcsv($csvFilePointer);
+                if (!empty($row)) {
+                    $isInserted = $this->insertCsvChargeData($bluck, $givenVahed, $year, $row);
+                }
+                $givenVahed++;
+            }
+        }
+        return $isInserted;
+    }
+
+    public function createTableIfNotExist($bluck, $year){
+        $dbname = $this->dbinformation->dbname;
+        $sql = "DROP TABLE IF EXISTS `{$dbname}`.`{$bluck}_{$year}`";
+        $this->query($sql);
+        $sql = "CREATE TABLE IF NOT EXISTS `{$dbname}`.`{$bluck}_{$year}` (
+            `واحد` int(2) PRIMARY KEY,
+            `محرم` int(11),
+            `صفر` int(11),
+            `ربیع الاول` int(11),
+            `ربیع الثانی` int(11),
+            `جمادی الاول` int(11),
+            `جمادی الثانی` int(11),
+            `رجب` int(11),
+            `شعبان` int(11),
+            `رمضان` int(11),
+            `شوال` int(11),
+            `ذیقعده` int(11),
+            `ذیحجه` int(11),
+            `جمع` int(11)
+        )";
+        $query = $this->query($sql);
+        return $query ? true : false;
+    }
+
+    public function insertCsvChargeData($bluck, $vahed, $year, $chargeData) {
+        $sql = "INSERT INTO {$bluck}_{$year} VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $sumOfCharges = array_sum($chargeData);
+        $chargeData[] = $sumOfCharges;
+        $query = $this->query($sql, "ssssssssssssss", $vahed, ...$chargeData);
+        return $query;
     }
 }
 

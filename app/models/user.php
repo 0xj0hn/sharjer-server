@@ -48,6 +48,12 @@ class UserModel extends Model{
         return $query;
     }
 
+    public function changePassword($username, $password, $newPassword){
+        $encryptedPassword = $this->encrypt($newPassword);
+        $sql = "UPDATE users SET `password` = ? WHERE username = ? AND password = ?";
+        $query = $this->query($sql, "sss", $encryptedPassword, $username, $password);
+        return $query ? true : false;
+    }
     public function getFinancialStatus(){
         $fileName = "financial_status.json";
         $file = fopen($fileName, "r");
@@ -141,16 +147,14 @@ class UserModel extends Model{
     public function getYears(){
         $years = [];
         $dbname = $this->dbinformation->dbname;
-        $sql = "SELECT * FROM information_schema.TABLES WHERE TABLE_SCHEMA='$dbname'";
+        $sql = "SELECT * FROM information_schema.TABLES WHERE TABLE_SCHEMA='$dbname' AND TABLE_NAME LIKE 'bluck%'";
         $query = $this->query($sql);
         $query = $query->get_result();
         if ($query->num_rows > 0){
             while($row = $query->fetch_assoc()){
-                if (str_contains($row["TABLE_NAME"], "bluck")){
-                    $table = $row["TABLE_NAME"];
-                    $year = preg_replace("/bluck[0-9]_/", "", $table);
-                    array_push($years, $year);
-                }
+                $table = $row["TABLE_NAME"];
+                $year = preg_replace("/bluck[0-9]_/", "", $table);
+                array_push($years, $year);
             }
         }else{
             return false;
@@ -179,7 +183,7 @@ class UserModel extends Model{
         foreach($years as $year){
             $sql = "SELECT * FROM bluck$bluck"."_$year WHERE `واحد` = ?";
             $query = $this->query($sql, "i", $vahed);
-            $result = $query->get_result();
+			$result = $query->get_result();
             while($row = $result->fetch_assoc()){
                 $yearWrapperArr = array($year => $row);
                 $results[] = $yearWrapperArr;
