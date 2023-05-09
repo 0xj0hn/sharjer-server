@@ -304,7 +304,7 @@ class PaymentModel extends Model {
             }
             return $users;
         }
-        return false;
+        return $users;
     }
 
     public function getNameOfTheUser($bluck, $vahed){
