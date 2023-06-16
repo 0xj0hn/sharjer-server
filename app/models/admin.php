@@ -298,13 +298,37 @@ class AdminModel extends Model{
             $givenVahed = 1; //the line number is the user's vahed
             while(!feof($csvFilePointer)) {
                 $row = fgetcsv($csvFilePointer);
+                $dbLikeChargeData = $this->generateDBLikeChargeData($row);
                 if (!empty($row)) {
-                    $isInserted = $this->insertCsvChargeData($bluck, $givenVahed, $year, $row);
+                    $isInserted = $this->insertCsvChargeData($bluck, $givenVahed, $year, $dbLikeChargeData);
                 }
                 $givenVahed++;
             }
         }
         return $isInserted;
+    }
+
+    public function generateDBLikeChargeData($row){
+        $zeroCounts = 0; // indicate the number of the zeros in a row of charges.
+        $tempRow = $row;
+        foreach($row as $index => $paidCharge) {
+            if ($paidCharge == "0") {
+                $zeroCounts++;
+            }
+            else if ($zeroCounts > 0) {
+                $dividedCharge = (string)intval($paidCharge / ($zeroCounts + 1));
+                for ($i = $index; $i > 0; $i--) {
+                    $tempRow[$i] = $dividedCharge;
+                    $zeroCounts = 0; //reset variable
+                }
+            }
+            else if ($paidCharge == "") {
+                $tempRow[$index] = "0";
+            }else{
+                $tempRow[$index] = $paidCharge;
+            }
+        }
+        return $tempRow;
     }
 
     public function createTableIfNotExist($bluck, $year){
