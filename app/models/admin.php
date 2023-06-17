@@ -322,7 +322,6 @@ class AdminModel extends Model{
             }
             else if ($zeroCounts > 0) {
                 $dividedCharge = (string)intval($paidCharge / ($zeroCounts + 1));
-                var_dump("z:$zeroCounts");
                 for ($i = $index; $i >= $zeroIndex; $i--) {
                     $row[$i] = $dividedCharge;
                     unset($tempRow[$zeroIndex]);
