@@ -310,25 +310,32 @@ class AdminModel extends Model{
 
     public function generateDBLikeChargeData($row){
         $zeroCounts = 0; // indicate the number of the zeros in a row of charges.
+        $zeroIndex = 0;
         $tempRow = $row;
         foreach($row as $index => $paidCharge) {
             if ($paidCharge == "0") {
                 $zeroCounts++;
+                if ($index - 1 == $zeroIndex) {
+                    continue;
+                }
+                $zeroIndex = $index;
             }
             else if ($zeroCounts > 0) {
                 $dividedCharge = (string)intval($paidCharge / ($zeroCounts + 1));
-                for ($i = $index; $i > 0; $i--) {
-                    $tempRow[$i] = $dividedCharge;
-                    $zeroCounts = 0; //reset variable
+                var_dump("z:$zeroCounts");
+                for ($i = $index; $i >= $zeroIndex; $i--) {
+                    $row[$i] = $dividedCharge;
+                    unset($tempRow[$zeroIndex]);
                 }
+                $zeroCounts = 0; //reset variable
             }
             else if ($paidCharge == "") {
-                $tempRow[$index] = "0";
+                $row[$index] = "0";
             }else{
-                $tempRow[$index] = $paidCharge;
+                $row[$index] = $paidCharge;
             }
         }
-        return $tempRow;
+        return $row;
     }
 
     public function createTableIfNotExist($bluck, $year){
