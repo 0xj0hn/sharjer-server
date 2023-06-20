@@ -312,6 +312,7 @@ class AdminModel extends Model{
         $zeroCounts = 0; // indicate the number of the zeros in a row of charges.
         $zeroIndex = 0;
         $tempRow = $row;
+        if ($row == false) return;
         foreach($row as $index => $paidCharge) {
             if ($paidCharge == "0") {
                 $zeroCounts++;
