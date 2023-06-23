@@ -26,7 +26,7 @@ class NotificationModel extends Model {
                 "Content-Type: application/json",
                 "Authorization: key=$firebaseApiKey"
             ],
-            CURLOPT_POSTFIELDS => json_encode($parameters)
+            CURLOPT_POSTFIELDS => json_encode($parameters, JSON_INVALID_UTF8_IGNORE | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES)
         ]
         );
         $response = curl_exec($curl);
