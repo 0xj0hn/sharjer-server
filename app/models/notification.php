@@ -1,7 +1,6 @@
 <?php
 class NotificationModel extends Model {
     public function sendNotif($title='title', $body='body', $devicesTokens, $navigation=null){
-        $devicesTokens = array_unique($devicesTokens);
         $curl = curl_init();
         $parameters = [
             "registration_ids" => $devicesTokens,
@@ -26,7 +25,7 @@ class NotificationModel extends Model {
                 "Content-Type: application/json",
                 "Authorization: key=$firebaseApiKey"
             ],
-            CURLOPT_POSTFIELDS => json_encode($parameters)
+            CURLOPT_POSTFIELDS => json_encode($parameters, JSON_INVALID_UTF8_IGNORE | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES)
         ]
         );
         $response = curl_exec($curl);
@@ -66,6 +65,8 @@ class NotificationModel extends Model {
         if (count($usersFirebaseTokens) == 0){
             return false;
         }
+        $usersFirebaseTokens = array_unique($usersFirebaseTokens);
+        $usersFirebaseTokens = array_values($usersFirebaseTokens);
         return $usersFirebaseTokens;
     }
 
