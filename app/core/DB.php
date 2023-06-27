@@ -3,7 +3,7 @@
 
 class DB {
     protected $mysql;
-    protected $dbinformation;
+    public $dbinformation;
     private $encryptionMethod = "AES-256-CBC";
     private $encryptionKey = "mojtama-amoli-residentialcomplex"; //32 bytes
     private $encryptionIV = "mojtama-amoliaaa"; //16 bytes

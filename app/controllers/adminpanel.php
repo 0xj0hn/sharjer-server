@@ -484,6 +484,27 @@ class AdminPanel extends Controller{
         }
 
     }
+
+    public function create_year($year=null) {
+        $result = [];
+        if ($year == null || intval($year) == 0) {
+            $result = [
+                "status" => "error",
+                "message" => "you haven't provided `year`"
+            ];
+        }else{
+            $model = $this->model('payment');
+            $blucks = $model->dbinformation->blucks;
+            foreach($blucks as $bluck) {
+                $model->createTableIfNotExists($bluck, $year);
+            }
+            $result = [
+                "status" => "success",
+                "message" => "year has been added to database"
+            ];
+        }
+        $this->view("json", $result);
+    }
 }
 
 
