@@ -87,17 +87,37 @@ class PaymentModel extends Model {
         $vahed = $userInfo->vahed;
         $this->createTableIfNotExists($bluck, $vahed, $year);
         try{
-            $prepare = $this->prepareRowForCharge($bluck, $vahed, $year);
-            $update = $this->updateChargeMonth($bluck, $vahed, $year, $month, $price);
+            $this->prepareRowForCharge($bluck, $vahed, $year);
+            $this->updateChargeMonth($bluck, $vahed, $year, $month, $price);
         }catch(Exception $e){
-            $update = $this->updateChargeMonth($bluck, $vahed, $year, $month, $price);
+            $this->updateChargeMonth($bluck, $vahed, $year, $month, $price);
         }
         $this->addToPayHistory($userInfo, $year, $month, $price);
         require_once "app/models/notification.php";
-        $model = new NotificationModel;
-        $model->sendNotifToAllAdmins($fullName, $year, $month, $price);
+        require_once "app/models/user.php";
+        $notifModel = new NotificationModel;
+        $userModel = new UserModel;
+        $adminModel = new AdminModel; //these codes might not be best practice. but i need them. TODO: i might change them in the future.
+        $notifModel->sendNotifToAllAdmins($fullName, $year, $month, $price);
         $this->sumChargesUp($year, $bluck, $vahed);
-        return true;
+        $chargePaidPrice = $this->getChargePaidPrice($year, $month);
+        $financialStatus = $userModel->getFinancialStatus();
+        $generatedNewFinancialStatus = $adminModel->generateFinancialStatus($financialStatus, $chargePaidPrice);
+        $adminModel->addMojtamaFinancialStatus($generatedNewFinancialStatus);
+    }
+
+    public function getChargePaidPrice($year, $month) {
+        $blucks = $this->dbinformation->blucks;
+        $sumOfCharges = 0;
+        foreach($blucks as $bluck) {
+            $sql = "SELECT `$month` FROM bluck{$bluck}_{$year} WHERE `$month` != 0";
+            $query = $this->query($sql);
+            $result = $query->get_result();
+            while ($row = $result->fetch_assoc()) {
+                $sumOfCharges += (int)$row["$month"];
+            }
+        }
+        return $sumOfCharges;
     }
 
     public function createTableIfNotExists($bluck, $year) {

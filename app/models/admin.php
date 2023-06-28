@@ -167,10 +167,36 @@ class AdminModel extends Model{
         //  {'title': 'test', 'price':'100000'},
         //  {'title': 'test2', 'price': '200000'}
         // ]
+        //$jsonFinancialStatus = $this->generateFinancialStatus($jsonFinancialStatus);
         $fileName = "financial_status.json";
         $file = fopen($fileName, "w");
-        fwrite($file, json_encode($jsonFinancialStatus));
+        fwrite($file, $jsonFinancialStatus);
         fclose($file);
+    }
+
+    public function generateFinancialStatus($jsonFinancialStatus, $chargesPaidPrice=0) {
+        $decodedFinancialStatus = json_decode($jsonFinancialStatus, true);
+        $remainingPrice = $chargesPaidPrice;
+        $chargePaidKey = "+++ جمع شارژ پرداختی ماه +++";
+        $remainingKey = "+++ باقی مانده +++";
+        $decodedFinancialStatus = array_filter($decodedFinancialStatus, fn ($element) =>
+            $element["title"] != $chargePaidKey && $element["title"] != $remainingKey
+        );
+        foreach($decodedFinancialStatus as $decodedElementAsArr) {
+            foreach($decodedElementAsArr as $title => $price) {
+                $price = (int)$price;
+                $remainingPrice = $remainingPrice - $price;
+            }
+        }
+        array_unshift($decodedFinancialStatus, [
+            "title" => "+++ جمع شارژ پرداختی ماه +++",
+            "price" => (string)$chargesPaidPrice
+        ]); //put it in the first index(0)
+        $decodedFinancialStatus[] = [
+            "title" => "+++ باقی مانده +++",
+            "price" => (string)$remainingPrice
+        ]; //put it at the end of the array
+        return json_encode($decodedFinancialStatus);
     }
 
     public function removeUser($username){
