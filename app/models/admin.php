@@ -179,23 +179,16 @@ class AdminModel extends Model{
         $remainingPrice = $chargesPaidPrice;
         $chargePaidKey = "+++ جمع شارژ پرداختی ماه +++";
         $remainingKey = "+++ باقی مانده +++";
-        $decodedFinancialStatus = array_filter($decodedFinancialStatus, fn ($element) =>
-            $element["title"] != $chargePaidKey && $element["title"] != $remainingKey
+        $decodedFinancialStatus = array_filter($decodedFinancialStatus, fn ($key) =>
+            $key != $chargePaidKey && $key != $remainingKey,
+            ARRAY_FILTER_USE_KEY
         );
-        foreach($decodedFinancialStatus as $decodedElementAsArr) {
-            foreach($decodedElementAsArr as $title => $price) {
-                $price = (int)$price;
-                $remainingPrice = $remainingPrice - $price;
-            }
+        foreach($decodedFinancialStatus as $title => $price) {
+            $price = (int)$price;
+            $remainingPrice = $remainingPrice - $price;
         }
-        array_unshift($decodedFinancialStatus, [
-            "title" => "+++ جمع شارژ پرداختی ماه +++",
-            "price" => (string)$chargesPaidPrice
-        ]); //put it in the first index(0)
-        $decodedFinancialStatus[] = [
-            "title" => "+++ باقی مانده +++",
-            "price" => (string)$remainingPrice
-        ]; //put it at the end of the array
+        $decodedFinancialStatus[$chargePaidKey] = (string)$chargesPaidPrice;
+        $decodedFinancialStatus[$remainingKey] = (string)$remainingPrice;
         return json_encode($decodedFinancialStatus);
     }
 

@@ -278,6 +278,7 @@ class AdminPanel extends Controller{
             'password',
             'financial_json'
         ]);
+        $result = [];
         if ($validateRequiredParameters){
             $username = $_POST["username"];
             $password = $_POST["password"];
