@@ -3,8 +3,6 @@
 class AdminPanel extends Controller{
 
     public function update_month(...$params){
-        $model = $this->model('admin');
-        $notifModel = $this->model('notification');
         $month = $params[0];
         $validateParams = Validator::validateElements($_POST, [
             'username',
@@ -14,10 +12,18 @@ class AdminPanel extends Controller{
             if ($validateParams){
                 $username = $_POST["username"];
                 $password = $_POST["password"];
+                $model = $this->model('admin');
+                $notifModel = $this->model('notification');
+                $paymentModel = $this->model('payment');
+                $userModel = $this->model('user');
                 $isAdmin = $model->checkFullAdmin($username, $password);
                 if ($isAdmin){
-                    $update = $model->updateMonth($month);
-                    $sendNotif = $notifModel->sendNotifToAllMembersOnChargeTime();
+                    $model->updateMonth($month);
+                    $currentYear = $userModel->getThisYear();
+                    $chargePaidPrice = $paymentModel->getChargePaidPrice($currentYear, $month);
+                    $financialStatus = $userModel->getFinancialStatus();
+                    $generatedFinancialStatus = $model->generateFinancialStatus($financialStatus, $chargePaidPrice);
+                    $model->addMojtamaFinancialStatus($generatedFinancialStatus);
                     $result = [
                         "status" => "success",
                         "message" => "month was updated"
@@ -277,7 +283,13 @@ class AdminPanel extends Controller{
             $password = $_POST["password"];
             $financialStatusByJson = $_POST["financial_json"];
             $model = $this->model('admin');
-            $model->addMojtamaFinancialStatus($financialStatusByJson);
+            $paymentModel = $this->model('payment');
+            $userModel = $this->model('user');
+            $currentYear = $userModel->getThisYear();
+            $currentMonth = $userModel->getThisMonth();
+            $chargePaidPrice = $paymentModel->getChargePaidPrice($currentYear, $currentMonth);
+            $generatedNewFinancialStatus = $model->generateFinancialStatus($financialStatusByJson, $chargePaidPrice);
+            $model->addMojtamaFinancialStatus($generatedNewFinancialStatus);
             $result = [
                 "status" => "success",
                 "message" => "financial status added"
