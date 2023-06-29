@@ -173,6 +173,24 @@ class AdminModel extends Model{
         fclose($file);
     }
 
+    public function generateFinancialStatus($jsonFinancialStatus, $chargesPaidPrice=0) {
+        $decodedFinancialStatus = json_decode($jsonFinancialStatus, true);
+        $remainingPrice = $chargesPaidPrice;
+        $chargePaidKey = "+++ جمع شارژ پرداختی ماه +++";
+        $remainingKey = "+++ باقی مانده +++";
+        $decodedFinancialStatus = array_filter($decodedFinancialStatus, fn ($key) =>
+            $key != $chargePaidKey && $key != $remainingKey,
+            ARRAY_FILTER_USE_KEY
+        );
+        foreach($decodedFinancialStatus as $title => $price) {
+            $price = (int)$price;
+            $remainingPrice = $remainingPrice - $price;
+        }
+        $decodedFinancialStatus[$chargePaidKey] = (string)$chargesPaidPrice;
+        $decodedFinancialStatus[$remainingKey] = (string)$remainingPrice;
+        return json_encode($decodedFinancialStatus);
+    }
+
     public function removeUser($username){
         $sql = "DELETE FROM `users` WHERE `users`.`username` = ?";
         $query = $this->query($sql, "s", $username);
