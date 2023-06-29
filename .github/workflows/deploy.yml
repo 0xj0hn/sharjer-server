@@ -1,9 +1,10 @@
-name: Deploy
+name: deploy
 on:
   push:
     branches: ["deploy"]
-  runs-on: ubuntu-latest
-  jobs:
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - name: Upload Files
