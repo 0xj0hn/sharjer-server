@@ -164,13 +164,35 @@ class AdminModel extends Model{
     public function addMojtamaFinancialStatus($jsonFinancialStatus){
         // $jsonFinancialStatus:
         // [
-        //  {'title': 'test', 'price':'100000'},
-        //  {'title': 'test2', 'price': '200000'}
+        //  ['title' => 'price'],
+        //  ['title2' => 'price2']
         // ]
         $fileName = "financial_status.json";
         $file = fopen($fileName, "w");
         fwrite($file, json_encode($jsonFinancialStatus));
         fclose($file);
+    }
+
+    public function generateFinancialStatus($jsonFinancialStatus, $chargesPaidPrice=0) {
+        $decodedFinancialStatus = json_decode($jsonFinancialStatus, true);
+        $remainingPrice = $chargesPaidPrice;
+        $chargePaidKey = "+++ جمع شارژ پرداختی ماه +++";
+        $remainingKey = "+++ باقی مانده +++";
+        $decodedFinancialStatus = array_filter($decodedFinancialStatus, fn ($element) =>
+            array_keys($element)[0] != $chargePaidKey && array_keys($element)[0] != $remainingKey, //checks if title isn't $chargePaidKey or $remainingKey
+        );
+        var_dump($decodedFinancialStatus);
+        foreach($decodedFinancialStatus as $title => $price) {
+            $price = (int)$price;
+            $remainingPrice = $remainingPrice - $price;
+        }
+        array_unshift($decodedFinancialStatus, [
+            $chargePaidKey => (string)$chargesPaidPrice
+        ]); //put at the beginning
+        $decodedFinancialStatus[] = [
+            $remainingKey => (string)$remainingPrice
+        ]; //put at the end
+        return json_encode($decodedFinancialStatus);
     }
 
     public function removeUser($username){
