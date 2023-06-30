@@ -1,5 +1,5 @@
 <?php 
-define("ZIBAL_MERCHANT_KEY", "zibal");
+define("ZIBAL_MERCHANT_KEY", "643a406618f934089f7493cd");
 class Payment extends Controller {
 
     public function simple_charge(){
@@ -31,7 +31,7 @@ class Payment extends Controller {
             $vahed = $userInformation->vahed;
             $phoneNumber = $userInformation->phone;
             $sessionId = session_id();
-            $callbackUrl = "http://localhost/mojtama-server-mvc/payment/callback/?sessionId=$sessionId";
+            $callbackUrl = "https://amolicomplex.ir/mojtama-server-mvc/payment/callback/?sessionId=$sessionId";
             $_SESSION["username"] = $username;
             $_SESSION["password"] = $password;
             $_SESSION["year"] = $currentYear;
