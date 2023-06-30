@@ -21,7 +21,7 @@ class AdminPanel extends Controller{
                     $model->updateMonth($month);
                     $currentYear = $userModel->getThisYear();
                     $chargePaidPrice = $paymentModel->getChargePaidPrice($currentYear, $month);
-                    $financialStatus = $userModel->getFinancialStatus();
+                    $financialStatus = json_decode($userModel->getFinancialStatus());
                     $generatedFinancialStatus = $model->generateFinancialStatus($financialStatus, $chargePaidPrice);
                     $model->addMojtamaFinancialStatus($generatedFinancialStatus);
                     $result = [
