@@ -283,7 +283,7 @@ class PaymentModel extends Model {
     }
 
     public function getPayHistory(){
-        $sql = "SELECT * FROM payment_history ORDER BY id DESC";
+        $sql = "SELECT * FROM payment_history ORDER BY id DESC LIMIT 20";
         $query = $this->query($sql);
         $query = $query->get_result();
         $rows = [];
