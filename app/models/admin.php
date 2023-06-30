@@ -177,8 +177,8 @@ class AdminModel extends Model{
     public function generateFinancialStatus($jsonFinancialStatus, $chargesPaidPrice=0) {
         $decodedFinancialStatus = json_decode($jsonFinancialStatus, true);
         $remainingPrice = $chargesPaidPrice;
-        $chargePaidKey = "+++ جمع شارژ پرداختی ماه +++";
-        $remainingKey = "+++ باقی مانده +++";
+        $chargePaidKey = "* جمع شارژ پرداختی ماه *";
+        $remainingKey = "- باقی مانده -";
         $decodedFinancialStatus = array_filter($decodedFinancialStatus, fn ($element) =>
             array_keys($element)[0] != $chargePaidKey && array_keys($element)[0] != $remainingKey, //checks if title isn't $chargePaidKey or $remainingKey
         );
