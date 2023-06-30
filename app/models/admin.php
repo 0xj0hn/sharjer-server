@@ -182,9 +182,11 @@ class AdminModel extends Model{
         $decodedFinancialStatus = array_filter($decodedFinancialStatus, fn ($element) =>
             array_keys($element)[0] != $chargePaidKey && array_keys($element)[0] != $remainingKey, //checks if title isn't $chargePaidKey or $remainingKey
         );
-        foreach($decodedFinancialStatus as $title => $price) {
-            $price = (int)$price;
-            $remainingPrice = $remainingPrice - $price;
+        foreach($decodedFinancialStatus as $financialStatusElement) {
+            foreach($financialStatusElement as $title => $price) {
+                $price = (int)$price;
+                $remainingPrice = $remainingPrice - $price;
+            }
         }
         array_unshift($decodedFinancialStatus, [
             $chargePaidKey => (string)$chargesPaidPrice
