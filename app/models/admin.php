@@ -170,7 +170,7 @@ class AdminModel extends Model{
         //$jsonFinancialStatus = $this->generateFinancialStatus($jsonFinancialStatus);
         $fileName = "financial_status.json";
         $file = fopen($fileName, "w");
-        fwrite($file, $jsonFinancialStatus);
+        fwrite($file, json_encode($jsonFinancialStatus));
         fclose($file);
     }
 
