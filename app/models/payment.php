@@ -271,13 +271,14 @@ class PaymentModel extends Model {
     }
 
     public function addToPayHistory($userInfo, $year, $month, $price){
-        $sql = "INSERT INTO payment_history(full_name, message) VALUES (?, ?)";
+        $sql = "INSERT INTO payment_history(full_name, message, paid_at) VALUES (?, ?, ?)";
         $fullName = "{$userInfo->name} {$userInfo->family}";
         $price = intval($price) / 10; //try to make price as Toman
         $bluck = $userInfo->bluck;
         $vahed = $userInfo->vahed;
         $message = "$fullName بلوک {$bluck}، واحد {$vahed}، شارژ ماه $month سال $year را به مبلغ $price پرداخت کرد.";
-        $query = $this->query($sql, "ss", $fullName, $message);
+        $paidAt = jdate('d٫M٫Y\nHH:MM:SS');
+        $query = $this->query($sql, "ss", $fullName, $message, $paidAt);
         return $query ? true : false;
     }
 
@@ -288,11 +289,6 @@ class PaymentModel extends Model {
         $rows = [];
         if ($query->num_rows > 0){
             while($row = $query->fetch_assoc()){
-                $paidAt = $row["paid_at"];
-                $timezone = new DateTimeZone("UTC");
-                $dateTime = new DateTime($paidAt);
-                $dateTimeWithCorrectTimezone = $dateTime->setTimezone($timezone);
-                $row["paid_at"] = jdate("Y-m-d\nH:i:s", $dateTimeWithCorrectTimezone->getTimestamp(), '', 'UTC');
                 $rows[] = $row;
             }
             return $rows;
