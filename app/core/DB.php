@@ -9,9 +9,9 @@ class DB {
     private $encryptionIV = "mojtama-amoliaaa"; //16 bytes
     public function __construct(){
         $host = "localhost";
-        $username = "root";
+        $username = "amolic";
         $password = "Mhdmhdmhd82@#";
-        $dbname = "amoli";
+        $dbname = "amolic_amoli";
         $this->dbinformation = (object)[
             "host" => $host,
             "username" => $username,
