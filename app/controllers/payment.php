@@ -31,7 +31,7 @@ class Payment extends Controller {
             $vahed = $userInformation->vahed;
             $phoneNumber = $userInformation->phone;
             $sessionId = session_id();
-            $callbackUrl = "http://192.168.42.62/mojtama-server-mvc/payment/callback/?sessionId=$sessionId";
+            $callbackUrl = "http://localhost/mojtama-server-mvc/payment/callback/?sessionId=$sessionId";
             $_SESSION["username"] = $username;
             $_SESSION["password"] = $password;
             $_SESSION["year"] = $currentYear;
