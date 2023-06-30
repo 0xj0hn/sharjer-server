@@ -95,13 +95,14 @@ class PaymentModel extends Model {
         $this->addToPayHistory($userInfo, $year, $month, $price);
         require_once "app/models/notification.php";
         require_once "app/models/user.php";
+        require_once "app/models/admin.php";
         $notifModel = new NotificationModel;
         $userModel = new UserModel;
         $adminModel = new AdminModel; //these codes might not be best practice. but i need them. TODO: i might change them in the future.
         $notifModel->sendNotifToAllAdmins($fullName, $year, $month, $price);
         $this->sumChargesUp($year, $bluck, $vahed);
         $chargePaidPrice = $this->getChargePaidPrice($year, $month);
-        $financialStatus = $userModel->getFinancialStatus();
+        $financialStatus = json_decode($userModel->getFinancialStatus());
         $generatedNewFinancialStatus = $adminModel->generateFinancialStatus($financialStatus, $chargePaidPrice);
         $adminModel->addMojtamaFinancialStatus($generatedNewFinancialStatus);
     }
