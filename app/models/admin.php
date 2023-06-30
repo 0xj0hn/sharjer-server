@@ -164,8 +164,8 @@ class AdminModel extends Model{
     public function addMojtamaFinancialStatus($jsonFinancialStatus){
         // $jsonFinancialStatus:
         // [
-        //  {'title': 'test', 'price':'100000'},
-        //  {'title': 'test2', 'price': '200000'}
+        //  ['title' => 'price'],
+        //  ['title2' => 'price2']
         // ]
         //$jsonFinancialStatus = $this->generateFinancialStatus($jsonFinancialStatus);
         $fileName = "financial_status.json";
@@ -179,16 +179,19 @@ class AdminModel extends Model{
         $remainingPrice = $chargesPaidPrice;
         $chargePaidKey = "+++ جمع شارژ پرداختی ماه +++";
         $remainingKey = "+++ باقی مانده +++";
-        $decodedFinancialStatus = array_filter($decodedFinancialStatus, fn ($key) =>
-            $key != $chargePaidKey && $key != $remainingKey,
-            ARRAY_FILTER_USE_KEY
+        $decodedFinancialStatus = array_filter($decodedFinancialStatus, fn ($element) =>
+            array_keys($element)[0] != $chargePaidKey && array_keys($element)[0] != $remainingKey, //checks if title isn't $chargePaidKey or $remainingKey
         );
         foreach($decodedFinancialStatus as $title => $price) {
             $price = (int)$price;
             $remainingPrice = $remainingPrice - $price;
         }
-        $decodedFinancialStatus[$chargePaidKey] = (string)$chargesPaidPrice;
-        $decodedFinancialStatus[$remainingKey] = (string)$remainingPrice;
+        array_unshift($decodedFinancialStatus, [
+            $chargePaidKey => (string)$chargesPaidPrice
+        ]); //put at the beginning
+        $decodedFinancialStatus[] = [
+            $remainingKey => (string)$remainingPrice
+        ]; //put at the end
         return json_encode($decodedFinancialStatus);
     }
 
