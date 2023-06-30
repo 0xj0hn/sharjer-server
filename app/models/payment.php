@@ -278,7 +278,7 @@ class PaymentModel extends Model {
         $vahed = $userInfo->vahed;
         $message = "$fullName بلوک {$bluck}، واحد {$vahed}، شارژ ماه $month سال $year را به مبلغ $price پرداخت کرد.";
         $paidAt = jdate('d٫M٫Y\nHH:MM:SS');
-        $query = $this->query($sql, "ss", $fullName, $message, $paidAt);
+        $query = $this->query($sql, "sss", $fullName, $message, $paidAt);
         return $query ? true : false;
     }
 
