@@ -179,6 +179,7 @@ class AdminModel extends Model{
         $remainingPrice = $chargesPaidPrice;
         $chargePaidKey = "+++ جمع شارژ پرداختی ماه +++";
         $remainingKey = "+++ باقی مانده +++";
+        var_dump($decodedFinancialStatus);
         $decodedFinancialStatus = array_filter($decodedFinancialStatus, fn ($element) =>
             array_keys($element)[0] != $chargePaidKey && array_keys($element)[0] != $remainingKey, //checks if title isn't $chargePaidKey or $remainingKey
         );
