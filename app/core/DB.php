@@ -23,6 +23,7 @@ class DB {
         ];
 
         $this->mysql = new mysqli($host, $username, $password, $dbname);
+        $this->mysql->query("set names utf-8");
         if ($this->mysql->connect_error){
             die("ERROR: " . $this->mysql->connect_error);
         }
