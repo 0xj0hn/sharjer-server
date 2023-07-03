@@ -60,14 +60,14 @@ class Payment extends Controller {
                 }
             }else{
                 $result = [
-                    "code" => 404
+                    "code" => 404,
                     "status" => "charge_paid",
                     "message" => "the charge was paid"
                 ];
             }
         }else{
             $result = [
-                "code" => 401
+                "code" => 401,
                 "status" => "error",
                 "message" => "validation error"
             ];
