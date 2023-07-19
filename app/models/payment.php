@@ -85,7 +85,7 @@ class PaymentModel extends Model {
         $fullName = "{$userInfo->name} {$userInfo->family}";
         $bluck = $userInfo->bluck;
         $vahed = $userInfo->vahed;
-        $this->createTableIfNotExists($bluck, $vahed, $year);
+        $this->createTableIfNotExists($bluck, $year);
         try{
             $this->prepareRowForCharge($bluck, $vahed, $year);
             $this->updateChargeMonth($bluck, $vahed, $year, $month, $price);
