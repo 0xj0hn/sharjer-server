@@ -108,10 +108,11 @@ class User extends Controller{
 
     public function get_month(){
         $model = $this->model('user');
+        $year = $model->getThisYear();
         $month = $model->getThisMonth();
         $result = [
             "status" => "success",
-            "month" => "$month"
+            "month" => "$month $year"
         ];
         $this->view("json", $result);
     }
