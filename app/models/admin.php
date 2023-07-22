@@ -20,6 +20,12 @@ class AdminModel extends Model{
         return $this->encrypt($plainPassword);
     }
 
+    public function updateYear($year) {
+        $sql = "UPDATE charge SET year = ?";
+        $result = $this->query($sql, "i", $year);
+        return $result ? true : false;
+    }
+
     public function updateMonth($month){
         $sql = "UPDATE charge SET month = ?";
         $res = $this->query($sql, "s", $month);

@@ -110,24 +110,11 @@ class UserModel extends Model{
     }
 
     public function getThisYear(){
-        //using request to an api:
-        $currentTimestamp = time();
-        $date = date("d-m-Y", $currentTimestamp);
-        $returnedJson = file_get_contents("http://api.aladhan.com/v1/gToH/$date");
-        $returnedJson = json_decode($returnedJson, true);
-        if (array_key_exists("code", $returnedJson) && $returnedJson["code"] == 200){
-            $thisYear = $returnedJson["data"]["hijri"]["year"];
-            return $thisYear;
-        } //if the api method doesn't work, it will use the most updated year in DB.
-        //using the most updated year table
-        $years = $this->getYears();
-        $maxYear = 0;
-        foreach($years as $year){
-            if ($year > $maxYear){
-                $maxYear = $year;
-            }
-        }
-        $thisYear = $maxYear;
+        $sql = "SELECT year FROM charge";
+        $query = $this->query($sql);
+        $result = $query->get_result();
+        $rows = $result->fetch_all(MYSQLI_ASSOC);
+        $thisYear = $rows[0]["year"];
         return $thisYear;
     }
 
