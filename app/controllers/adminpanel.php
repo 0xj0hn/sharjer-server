@@ -1,6 +1,40 @@
 <?php 
 
 class AdminPanel extends Controller{
+    public function update_year(...$params) {
+        $year = $params[0];
+        $result = [];
+        $validateElements = Validator::validateElements($_POST, [
+            'username',
+            'password'
+        ]);
+        if (!empty($year) && $validateElements) {
+            $username = $_POST["username"];
+            $password = $_POST["password"];
+            $model = $this->model('admin');
+            $isAdmin = $model->checkFullAdmin($username, $password);
+            if ($isAdmin) {
+                $model->updateYear($year);
+                $result = [
+                    "status" => "success",
+                    "message" => "the year has been changed"
+                ];
+            }else{
+                $result = [
+                    "code" => 401,
+                    "status" => "error",
+                    "message" => "permission denied"
+                ];
+            }
+        }else{
+            $result = [
+                "code" => 400,
+                "status" => "error",
+                "message" => "validation error"
+            ];
+        }
+        $this->view("json", $result);
+    }
 
     public function update_month(...$params){
         $month = $params[0];
