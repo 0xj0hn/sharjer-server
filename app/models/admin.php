@@ -250,6 +250,7 @@ class AdminModel extends Model{
         $chargePricesFile = fopen($chargePricesFileName, "r");
         $chargePricesContent = fread($chargePricesFile, filesize($chargePricesFileName));
         $chargePricesContentDecoded = json_decode($chargePricesContent, true);
+        $sortedPricesByKeys = krsort($chargePricesContentDecoded);
         fclose($chargePricesFile);
         return $chargePricesContentDecoded;
     }
