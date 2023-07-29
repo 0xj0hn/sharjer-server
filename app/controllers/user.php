@@ -106,6 +106,25 @@ class User extends Controller{
         $this->view("json", $years);
     }
 
+    public function get_price() {
+        $model = $this->model('payment');
+        $currentPrice = $model->getCurrentPrice();
+        $result = [];
+        if ($currentPrice) {
+            $result = [
+                "status" => "success",
+                "message" => (int)$currentPrice,
+            ];
+        }else{
+            $result = [
+                "code" => 404,
+                "status" => "error",
+                "message" => "failed to retrieve current price"
+            ];
+        }
+        $this->view('json', $result);
+    }
+
     public function get_month(){
         $model = $this->model('user');
         $year = $model->getThisYear();
