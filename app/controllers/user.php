@@ -127,11 +127,14 @@ class User extends Controller{
 
     public function get_month(){
         $model = $this->model('user');
+        $paymentModel = $this->model('payment');
         $year = $model->getThisYear();
         $month = $model->getThisMonth();
+        $price = $paymentModel->getCurrentPrice();
+        $price = (int)$price / 10;
         $result = [
             "status" => "success",
-            "month" => "$month $year"
+            "month" => "$month $year\n$price تومان"
         ];
         $this->view("json", $result);
     }
