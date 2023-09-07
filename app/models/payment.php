@@ -137,7 +137,12 @@ class PaymentModel extends Model {
             `ذیقعده` int(11),
             `ذیحجه` int(11),
             `جمع` int(11)
-        )";
+        ); ";
+        $sql = $sql + "INSERT INTO `bluck{$bluck}_{$year} VALUES ";
+        $numBluckMembers = $this->dbinformation->num_bluck_members;
+        for ($vahed = 1; $vahed <= $numBluckMembers; $vahed++) {
+            $sql = $sql + "('$vahed', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)\n";
+        }
         $query = $this->query($sql);
         return $query ? true : false;
     }
