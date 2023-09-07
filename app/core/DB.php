@@ -17,6 +17,7 @@ class DB {
             "username" => $username,
             "password" => $password,
             "dbname" => $dbname,
+            "num_bluck_members" => 20,
             "blucks" => [
                 1,2,3
             ]
