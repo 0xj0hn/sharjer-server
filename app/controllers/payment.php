@@ -153,8 +153,6 @@ class Payment extends Controller {
 
     public function callback(){
         $getParams = $_GET;
-        $model = $this->model('payment');
-        $userModel = $this->model('user');
         $result = [];
         $validate = Validator::validateElements($getParams, [
             "sessionId",
@@ -177,6 +175,8 @@ class Payment extends Controller {
             $success = $_GET["success"];
             $orderId = $_GET["orderId"];
             $trackId = $_GET["trackId"];
+            $model = $this->model('payment');
+            $userModel = $this->model('user');
             $userInformation = $userModel->getUserInformation($username, $password);
             if ($success == 1){
                 $parameters = array(
